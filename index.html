@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>予約フォーム</title>
+    <script src="https://static.line-scdn.net/liff/edge/2.21/sdk.js"></script>
+</head>
+<body>
+    <h2>予約フォーム</h2>
+    <form id="reservationForm">
+        <h3>予約日</h3>
+        <select id="dateSelect"><option value="">-- 日付を選択 --</option></select><br>
+        
+        <h3>予約時間</h3>
+        <select id="timeSelect"><option value="">-- 時間を選択 --</option></select><br>
+        
+        <h3>好きな飲み物</h3>
+        <label><input type="checkbox" name="drink" value="コーヒー"> コーヒー</label><br>
+        <label><input type="checkbox" name="drink" value="紅茶"> 紅茶</label><br>
+        <label><input type="checkbox" name="drink" value="ジュース"> ジュース</label><br>
+        
+        <h3>メッセージ</h3>
+        <textarea id="messageInput" rows="3"></textarea><br>
+        
+        <button type="button" onclick="submitReservation()">予約する</button>
+    </form>
+
+    <script src="script.js"></script>
+</body>
+</html>
