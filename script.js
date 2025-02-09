@@ -1,5 +1,5 @@
-const GAS_API_URL = "YOUR_GAS_WEB_APP_URL"; // GASのURLを入れる
-const LIFF_ID = "YOUR_LIFF_ID"; // LINE LIFF ID
+const GAS_API_URL = "https://script.google.com/macros/library/d/1gPrh4nfeh6agqJyVFO9MZNPowXDnIIF2S4Bq3SkREhNMtdJ_qHefDB9v/2"; // GASのURLを入れる
+const LIFF_ID = "https://liff.line.me/1653447401-vlyOgDZO"; // LINE LIFF ID
 
 document.addEventListener("DOMContentLoaded", function() {
     liff.init({ liffId: LIFF_ID })
