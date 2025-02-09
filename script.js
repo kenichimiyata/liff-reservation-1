@@ -1,4 +1,4 @@
-const GAS_API_URL = "https://script.google.com/macros/library/d/1gPrh4nfeh6agqJyVFO9MZNPowXDnIIF2S4Bq3SkREhNMtdJ_qHefDB9v/2"; // GASのURLを入れる
+const GAS_API_URL = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycbypYewhi9BRPgTogA3eUrcogX5XUQOgSh-vsp5BtmkmC9y8l-Ffemm81myxBdJ5L1CqfA/exec"; // GASのURLを入れる
 const LIFF_ID = "https://liff.line.me/1653447401-vlyOgDZO"; // LINE LIFF ID
 
 document.addEventListener("DOMContentLoaded", function() {
