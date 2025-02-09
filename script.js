@@ -1,4 +1,45 @@
-const GAS_API_URL = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycby1DhJiYykQi3PhkJigxHmcADsOE7So8GU592vpDNr81Scde8zRP0A7Bb_LWYeZMIOJlg/exec"; // GASのAPI URLを設定
+const GAS_API_URL = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycby1DhJiYykQi3PhkJigxHmcADsOE7So8GU592vpDNr81Scde8zRP0A7Bb_LWYeZMIOJlg/exec"; // GASのURLを入れる
+const LIFF_ID = "1653447401-vlyOgDZO"; // LINE LIFF ID
+
+document.addEventListener("DOMContentLoaded", function() {
+    liff.init({ liffId: LIFF_ID })
+        .then(() => console.log("LIFF initialized"))
+        .catch(err => console.error("LIFF initialization failed", err));
+
+    fetch(GAS_API_URL + "?func=getDateOptions")
+        .then(response => response.json())
+        .then(data => populateDateOptions(data.options))
+        .catch(error => console.error("Error fetching dates:", error));
+});
+
+document.getElementById("dateSelect").addEventListener("change", function() {
+    let selectedDate = this.value;
+    fetch(GAS_API_URL + `?func=getTimeOptions&date=${selectedDate}`)
+        .then(response => response.json())
+        .then(data => populateTimeOptions(data.options))
+        .catch(error => console.error("Error fetching times:", error));
+});
+
+function populateDateOptions(dateList) {
+    let dateSelect = document.getElementById("dateSelect");
+    dateList.forEach(dateObj => {
+        let option = document.createElement("option");
+        option.value = dateObj.value;
+        option.textContent = dateObj.label;
+        dateSelect.appendChild(option);
+    });
+}
+
+function populateTimeOptions(timeList) {
+    let timeSelect = document.getElementById("timeSelect");
+    timeSelect.innerHTML = '<option value="">-- 時間を選択 --</option>';
+    timeList.forEach(timeObj => {
+        let option = document.createElement("option");
+        option.value = timeObj.value;
+        option.textContent = timeObj.label;
+        timeSelect.appendChild(option);
+    });
+}
 
 function submitReservation() {
     let reservationData = {
