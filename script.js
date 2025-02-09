@@ -1,5 +1,5 @@
 const GAS_API_URL = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycbwcw5VKhEGcHbF39S9P_UJ1lBcYWvu52_N0d2oE-4DUq5ljgJObVwBXDm8XgyQZBO_L6A/exec";
-const LIFF_ID = "1653447401-vlyOgDZO"; 
+const LIFF_ID = "https://liff.line.me/1653447401-vlyOgDZO"; 
 
 document.addEventListener("DOMContentLoaded", function () {
     liff.init({
