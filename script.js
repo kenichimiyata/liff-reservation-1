@@ -1,67 +1,65 @@
-const GAS_API_URL = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycby1DhJiYykQi3PhkJigxHmcADsOE7So8GU592vpDNr81Scde8zRP0A7Bb_LWYeZMIOJlg/exec"; // GASのURLを入れる
-const LIFF_ID = "1653447401-vlyOgDZO"; // LINE LIFF ID
+const url = "https://script.google.com/macros/s/AKfycbzNGhG5KcV9tBT60v7OsL67xTkpCi_pchVd3V8YNuR3vNzt75N2ce3eC4wZTSKOGLs_rQ/exec"; // GASのWebアプリURL
 
-document.addEventListener("DOMContentLoaded", function() {
-    liff.init({ liffId: LIFF_ID })
-        .then(() => console.log("LIFF initialized"))
-        .catch(err => console.error("LIFF initialization failed", err));
+async function fetchEvents() {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTPエラー: ${response.status}`);
+        }
+        const data = await response.json();
+        return data.events;
+    } catch (error) {
+        console.error("エラー:", error);
+        return [];
+    }
+}
 
-    fetch(GAS_API_URL + "?func=getDateOptions")
-        .then(response => response.json())
-        .then(data => populateDateOptions(data.options))
-        .catch(error => console.error("Error fetching dates:", error));
-});
+function formatDate(date) {
+    return date.toISOString().split("T")[0]; // YYYY-MM-DD
+}
 
-document.getElementById("dateSelect").addEventListener("change", function() {
-    let selectedDate = this.value;
-    fetch(GAS_API_URL + `?func=getTimeOptions&date=${selectedDate}`)
-        .then(response => response.json())
-        .then(data => populateTimeOptions(data.options))
-        .catch(error => console.error("Error fetching times:", error));
-});
+async function setupCalendar() {
+    const events = await fetchEvents();
+    const availableDates = events.map(event => event.date.split(" ")[0]);
 
-function populateDateOptions(dateList) {
-    let dateSelect = document.getElementById("dateSelect");
-    dateList.forEach(dateObj => {
-        let option = document.createElement("option");
-        option.value = dateObj.value;
-        option.textContent = dateObj.label;
-        dateSelect.appendChild(option);
+    flatpickr("#datepicker", {
+        locale: "ja",
+        dateFormat: "Y-m-d",
+        enable: availableDates, // 予約可能な日だけ選択可能
+        disableMobile: true,
+        inline: true // カレンダーを常に表示
     });
 }
 
-function populateTimeOptions(timeList) {
-    let timeSelect = document.getElementById("timeSelect");
-    timeSelect.innerHTML = '<option value="">-- 時間を選択 --</option>';
-    timeList.forEach(timeObj => {
-        let option = document.createElement("option");
-        option.value = timeObj.value;
-        option.textContent = timeObj.label;
-        timeSelect.appendChild(option);
-    });
+function generateTimeSlots() {
+    const timeButtonsContainer = document.getElementById("time-buttons");
+
+    for (let hour = 11; hour <= 18; hour++) {
+        for (let minutes = 0; minutes < 60; minutes += 30) {
+            if (hour === 18 && minutes > 30) {
+                break;
+            }
+            let time = `${hour.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+
+            let button = document.createElement("button");
+            button.textContent = time;
+            button.classList.add("time-button");
+
+            button.addEventListener('click', () => {
+                document.getElementById("selected-time").value = `${time}`;
+            });
+
+            timeButtonsContainer.appendChild(button);
+        }
+    }
 }
 
 function submitReservation() {
-    let reservationData = {
-        date: document.getElementById("dateSelect").value,
-        time: document.getElementById("timeSelect").value,
-        drinks: Array.from(document.querySelectorAll('input[name="drink"]:checked')).map(el => el.value),
-        message: document.getElementById("messageInput").value
-    };
-
-    fetch(GAS_API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(reservationData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.statusCode === 200) {
-            alert("予約が完了しました！");
-            liff.closeWindow();
-        } else {
-            alert("予約に失敗しました。");
-        }
-    })
-    .catch(error => console.error("Error submitting reservation:", error));
+    const selectedTime = document.getElementById("selected-time").value;
+    alert(`予約日時: ${selectedTime}`);
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    setupCalendar();
+    generateTimeSlots();
+});
