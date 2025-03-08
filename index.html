@@ -3,90 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>予約アンケート</title>
-    <script src="https://static.line-scdn.net/liff/edge/2.21/sdk.js"></script>
+    <title>日時選択</title>
+    <link rel="stylesheet" href="styles.css"> <!-- 外部CSSファイルをリンク -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
 </head>
+
 <body>
-    <h2>予約アンケートにご協力ください</h2>
+<h2>来店予約</h2>
+<h4 style="text-align: center;"><strong>ご希望のお日時を下記より選択してください</strong></h4>
 
-    <form id="surveyForm">
-        <h3>Q1. 予約日を選んでください</h3>
-        <select name="reservationDate" id="dateSelect">
-            <option value="">-- 日付を選択 --</option>
-        </select><br>
+    <div id="calendar-container">
+        <input type="text" id="datepicker">
+    </div>
+<br>
+    <div id="time-container">
+        <div id="time-buttons" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; justify-content: center; padding-left: 10px; padding-right: 10px;"></div>
+    </div>
 
-        <h3>Q2. 予約時間を選んでください</h3>
-        <select name="reservationTime" id="timeSelect">
-            <option value="">-- 時間を選択 --</option>
-        </select><br>
+    <h4 style="text-align: center;"><strong>選択いただいた日時をご確認ください</strong></h4>
+    <div>
+        <textarea id="selected-time" rows="4" cols="50" readonly></textarea>
+    </div>
 
-        <h3>Q3. 好きな飲み物を選んでください</h3>
-        <label><input type="checkbox" name="drink" value="コーヒー"> コーヒー</label><br>
-        <label><input type="checkbox" name="drink" value="紅茶"> 紅茶</label><br>
-        <label><input type="checkbox" name="drink" value="ジュース"> ジュース</label><br>
+    <div style="text-align: center;">
+        <button onclick="submitReservation()">予約する</button>
+    </div>
 
-        <h3>Q4. 何か一言お願いします！</h3>
-        <textarea name="message" rows="3" cols="30" placeholder="コメントを入力してください"></textarea><br>
+    <!-- 外部JavaScriptファイルを読み込む -->
+    <script src="script.js"></script>
 
-        <button type="button" onclick="sendAnswer()">送信</button>
-    </form>
-
-    <script>
-        const GAS_API_URL = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycby1DhJiYykQi3PhkJigxHmcADsOE7So8GU592vpDNr81Scde8zRP0A7Bb_LWYeZMIOJlg/exec"; // ここにGASのデプロイURLを入れる
-
-        document.addEventListener("DOMContentLoaded", function() {
-            liff.init({ liffId: "YOUR_LIFF_ID" })
-                .then(() => console.log("LIFF initialized"))
-                .catch(err => console.error("LIFF initialization failed", err));
-
-            fetch(GAS_API_URL + "?func=getDateButtons")
-                .then(response => response.json())
-                .then(data => populateDateOptions(data.buttons))
-                .catch(error => console.error("Error fetching dates:", error));
-
-            fetch(GAS_API_URL + "?func=getTimeButtons")
-                .then(response => response.json())
-                .then(data => populateTimeOptions(data.buttons))
-                .catch(error => console.error("Error fetching times:", error));
-        });
-
-        function populateDateOptions(dateList) {
-            let dateSelect = document.getElementById("dateSelect");
-            dateList.forEach(dateObj => {
-                let option = document.createElement("option");
-                option.value = dateObj.date;
-                option.textContent = dateObj.label;
-                dateSelect.appendChild(option);
-            });
-        }
-
-        function populateTimeOptions(timeList) {
-            let timeSelect = document.getElementById("timeSelect");
-            timeList.forEach(timeObj => {
-                let option = document.createElement("option");
-                option.value = timeObj.time;
-                option.textContent = timeObj.label;
-                timeSelect.appendChild(option);
-            });
-        }
-
-        function sendAnswer() {
-            let message = `予約日: ${document.getElementById("dateSelect").value}\n`;
-            message += `予約時間: ${document.getElementById("timeSelect").value}\n`;
-
-            document.querySelectorAll('input[type="checkbox"]:checked').forEach((el) => {
-                message += `好きな飲み物: ${el.value}\n`;
-            });
-
-            let comment = document.querySelector('textarea[name="message"]').value.trim();
-            if (comment) message += `メッセージ: ${comment}`;
-
-            if (liff.isInClient()) {
-                liff.sendMessages([{ type: "text", text: message }])
-                    .then(() => { alert("回答が送信されました"); liff.closeWindow(); })
-                    .catch(err => console.error("メッセージ送信失敗", err));
-            }
-        }
-    </script>
 </body>
 </html>
