@@ -1,3 +1,7 @@
+function showHTML() {
+    return HtmlService.createHtmlOutputFromFile("reserve_personal.html")
+        .setTitle("予約システム");
+}
 function requireE(filename) {
     return HtmlService.createHtmlOutputFromFile(filename).getContent();
     //  return HtmlService
