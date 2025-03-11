@@ -5,13 +5,59 @@ body {
     background-color: #f9f9f9;
 }
 
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 400px;
+    margin: auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+}
+
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    width: 100%;
+    background-color: #06c755;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin-top: 20px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #04b245;
+}
+
+.required {
+    color: red;
+}
+
 #calendar-container {
     width: 100%;
-    max-width: 800px; /* 横幅を適度に制限 */
-    margin: 0 auto; /* 中央揃え */
+    max-width: 800px;
+    margin: 0 auto;
     text-align: center;
     display: flex;
-    justify-content: center; /* 中央揃え */
+    justify-content: center;
 }
 
 #datepicker {
@@ -19,13 +65,13 @@ body {
 }
 
 .flatpickr-calendar {
-    margin: 0 auto !important; /* カレンダーを中央に配置 */
+    margin: 0 auto !important;
     width: 100% !important;
-    max-width: 310px; /* 必要に応じて最大幅を制限 */
+    max-width: 310px;
 }
 
 .flatpickr-days {
-    text-align: center; /* 日付部分を中央に配置 */
+    text-align: center;
 }
 
 .flatpickr-day {
@@ -44,9 +90,9 @@ body {
     border-radius: 5px;
     transition: background-color 0.3s;
     display: block;
-    margin: 2px auto; /* ボタン中央揃え */
-    width: 350px; /* デフォルト幅は350px */
-    text-align: center; /* ボタン内のテキストもセンタリング */
+    margin: 2px auto;
+    width: 350px;
+    text-align: center;
 }
 
 .time-button:hover {
@@ -63,32 +109,31 @@ textarea {
     line-height: 50px;
     border: none;
     resize: none;
-    margin: 20px auto; /* テキストボックスの中央揃え */
+    margin: 20px auto;
     display: block;
 }
 
-/* レスポンシブ対応 */
 @media (max-width: 600px) {
     .time-button {
         font-size: 1.2em;
         padding: 2px;
-        width: 120px; /* スマホサイズではボタン幅を120pxに固定 */
-        margin: 2px auto; /* ボタン中央揃え */
+        width: 120px;
+        margin: 2px auto;
     }
 
     #time-container {
         display: flex;
-        flex-wrap: wrap; /* フレックスボックスを使ってラップ */
-        justify-content: center; /* 横方向の中央揃え */
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 10px;
-        padding-left: 10px; /* 左端の空白 */
-        padding-right: 10px; /* 右端の空白 */
+        padding-left: 10px;
+        padding-right: 10px;
     }
 
     textarea {
         font-size: 2.0em;
         line-height: 45px;
-        width: 90%; /* 幅を調整 */
+        width: 90%;
         margin: 20px auto;
     }
 
@@ -97,22 +142,17 @@ textarea {
         max-width: 100%;
     }
 
-    h2 {
+    h2, h4 {
         font-size: 1.5em;
-        text-align: center; /* タイトルもセンタリング */
+        text-align: center;
     }
 
-    h4 {
-        text-align: center; /* タイトルもセンタリング */
-    }
-
-    /* 予約ボタン */
     button {
         font-size: 1.2em;
         padding: 15px;
-        width: 50%; /* ボタン幅を調整 */
-        margin: 0 auto; /* 中央揃え */
-        display: block; /* ブロック要素にして中央に配置 */
+        width: 50%;
+        margin: 0 auto;
+        display: block;
         background-color: #06c755;
         color: white;
         font-weight: bold;
