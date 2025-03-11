@@ -1,3 +1,10 @@
+function requireE(filename) {
+    return HtmlService.createHtmlOutputFromFile(filename).getContent();
+    //  return HtmlService
+    //      .createTemplateFromFile(filename)
+    //      .evaluate();
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     async function fetchEvents() {
         try {
