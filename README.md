@@ -8,6 +8,7 @@
 
 ## 2️⃣ reserve_script.gs（サーバーサイド/GAS）  
 📌 役割
+- 「データ取得」「データ保存」など、データ処理のロジックを担当
 - index.html を表示
 - CSSとJSを読み込む
 - 必要なデータを doGet() で提供（APIとしてデータを返す）
@@ -15,6 +16,7 @@
 
 ## 3️⃣ reserve_script.js.html（クライアントサイドJavaScript）  
 📌 役割
+- 「表示」や「操作」に関するコード
 - fetchEvents() を使って doGet() のAPIから予約可能日を取得
 - flatpickr を使ってカレンダーに予約可能日を設定
 - generateTimeSlots() で時間選択ボタンを作成
