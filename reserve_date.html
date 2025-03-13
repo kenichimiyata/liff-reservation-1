@@ -1,37 +1,30 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日時選択</title>
-    <?= requireE("style.css") ?> <!-- 外部CSSファイルをリンク -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>日時選択</title>
+  <?= include("reserve_style.html") ?>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
 </head>
-
 <body>
-<h2>来店予約</h2>
-<h4 style="text-align: center;"><strong>ご希望のお日時を下記より選択してください</strong></h4>
+  <h2 style="text-align:center;">ご希望の日時を選択してください</h2>
+  
+  <div id="calendar-container">
+    <input type="text" id="datepicker">
+  </div>
 
-    <div id="calendar-container">
-        <input type="text" id="datepicker">
-    </div>
-<br>
-    <div id="time-container">
-        <div id="time-buttons" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; justify-content: center; padding-left: 10px; padding-right: 10px;"></div>
-    </div>
+  <h3 style="text-align:center;">時間を選択してください</h3>
+  <div id="time-buttons" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
 
-    <h4 style="text-align: center;"><strong>選択いただいた日時をご確認ください</strong></h4>
-    <div>
-        <textarea id="selected-time" rows="4" cols="50" readonly></textarea>
-    </div>
+  <h3 style="text-align:center;">選択日時</h3>
+  <textarea id="selected-time" readonly></textarea>
 
-    <div style="text-align: center;">
-        <button onclick="submitReservation()">予約する</button>
-    </div>
+  <div style="text-align:center;">
+    <button onclick="submitReservation()">次へ進む</button>
+  </div>
 
-    <!-- 外部JavaScriptファイルを読み込む -->
-    <script src="script.js"></script>
-
+  <?= include("reserve_client_js.html") ?>
 </body>
 </html>
