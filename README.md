@@ -13,6 +13,8 @@
 - CSSとJSを読み込む
 - 必要なデータを doGet() で提供（APIとしてデータを返す）
 - javascript
+- Googleアカウントと連携して動作し、カレンダーやスプレッドシートなど、機密情報にアクセス可能です。
+- このコードをクライアント側に置くと、不特定多数のユーザーに情報が漏れる恐れがあります。
 
 ## 3️⃣ reserve_script.js.html（クライアントサイドJavaScript）  
 📌 役割
@@ -21,6 +23,7 @@
 - flatpickr を使ってカレンダーに予約可能日を設定
 - generateTimeSlots() で時間選択ボタンを作成
 - submitReservation() でフォームを処理
+- ユーザー側（ブラウザ）で動くため、機密情報を持たない
 
 ## 4️⃣ style.css.html（スタイルシート/CSS）  
 📌 役割
