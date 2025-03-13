@@ -1,0 +1,64 @@
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  google.script.run.withSuccessHandler(setupCalendar).getEvents();
+  generateTimeSlots();
+});
+
+function setupCalendar(events) {
+  const availableDates = events.map(event => event.date.split(" ")[0]);
+  flatpickr("#datepicker", {
+    locale: "ja",
+    dateFormat: "Y-m-d",
+    enable: availableDates,
+    inline: true
+  });
+}
+
+function generateTimeSlots() {
+  const container = document.getElementById("time-buttons");
+  for (let hour = 11; hour <= 18; hour++) {
+    for (let minutes = 0; minutes < 60; minutes += 30) {
+      if(hour === 18 && minutes > 30) break;
+      const time = `${hour.toString().padStart(2,"0")}:${minutes.toString().padStart(2,"0")}`;
+      const btn = document.createElement("button");
+      btn.textContent = time;
+      btn.classList.add("time-button");
+      btn.onclick = () => document.getElementById("selected-time").value = time;
+      container.appendChild(btn);
+    }
+  }
+}
+
+function submitReservation() {
+  const selectedTime = document.getElementById("selected-time").value;
+  if (!selectedTime) {
+    alert("日時を選択してください");
+    return;
+  }
+  sessionStorage.setItem("selectedTime", selectedTime);
+  location.href = "<?= ScriptApp.getService().getUrl() ?>?page=personal";
+}
+
+function submitPersonalInfo() {
+  const personalData = {
+    time: sessionStorage.getItem("selectedTime"),
+    purpose: document.getElementById("purpose").value,
+    firstName: document.getElementById("first-name").value,
+    lastName: document.getElementById("last-name").value,
+    firstNameKana: document.getElementById("first-name-kana").value,
+    lastNameKana: document.getElementById("last-name-kana").value,
+    staff: document.getElementById("staff").value,
+    usage: document.getElementById("usage").value
+  };
+
+  for (let key in personalData) {
+    if (!personalData[key]) {
+      alert("すべての項目を入力してください。");
+      return;
+    }
+  }
+
+  google.script.run.submitReservationToSheet(personalData);
+  alert("予約が完了しました！");
+}
+</script>
