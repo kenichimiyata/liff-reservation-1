@@ -1,54 +1,55 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>個人データ入力</title>
-    <?= requireE("style.css") ?> <!-- 外部CSSファイルをリンク -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>個人情報入力</title>
+  <?= include("reserve_style.html") ?>
 </head>
 <body>
-    <header>
-        <h1>個人データ入力</h1>
-    </header>
-    <main>
-        <form id="reservation-form" method="post" action="submit.php">
-            <label for="purpose">ご用件 <span class="required">*</span></label>
-            <select id="purpose" name="purpose" required>
-                <option value="査定：店頭買取">査定：店頭買取</option>
-                <option value="精錬：申込">精錬：申込</option>
-                <option value="精錬：受取">精錬：受取</option>
-            </select>
-            
-            <label for="first-name">名 <span class="required">*</span></label>
-            <input type="text" id="first-name" name="first_name" required>
-            
-            <label for="last-name">姓 <span class="required">*</span></label>
-            <input type="text" id="last-name" name="last_name" required>
-            
-            <label for="first-name-kana">名 (フリガナ) <span class="required">*</span></label>
-            <input type="text" id="first-name-kana" name="first_name_kana" required>
-            
-            <label for="last-name-kana">姓 (フリガナ) <span class="required">*</span></label>
-            <input type="text" id="last-name-kana" name="last_name_kana" required>
-            
-            <label for="staff">担当者希望 <span class="required">*</span></label>
-            <select id="staff" name="staff" required>
-                <option value="希望無し">希望無し</option>
-                <option value="Nushiro">Nushiro</option>
-                <option value="Moa">Moa</option>
-                <option value="Sugi">Sugi</option>
-            </select>
-            
-            <label for="usage">当店のご利用回数 <span class="required">*</span></label>
-            <select id="usage" name="usage" required>
-                <option value="はじめて">はじめて</option>
-                <option value="2回目以降">2回目以降</option>
-                <option value="覚えていない">覚えていない</option>
-            </select>
-            
-            <button type="submit">送信</button>
-        </form>
-    </main>
-    <script src="script.js"></script>
+  <h2 style="text-align:center;">個人情報入力</h2>
+  <form id="reservation-form" style="max-width:500px;margin:auto;">
+    <label>ご用件<span class="required">*</span>
+      <select id="purpose" required>
+        <option>査定：店頭買取</option>
+        <option>精錬：申込</option>
+        <option>精錬：受取</option>
+      </select>
+    </label>
+
+    <label>名<span class="required">*</span>
+      <input type="text" id="first-name" required>
+    </label>
+    <label>姓<span class="required">*</span>
+      <input type="text" id="last-name" required>
+    </label>
+    <label>名（フリガナ）<span class="required">*</span>
+      <input type="text" id="first-name-kana" required>
+    </label>
+    <label>姓（フリガナ）<span class="required">*</span>
+      <input type="text" id="last-name-kana" required>
+    </label>
+
+    <label>担当者希望<span class="required">*</span>
+      <select id="staff" required>
+        <option>希望無し</option>
+        <option>Nushiro</option>
+        <option>Moa</option>
+        <option>Sugi</option>
+      </select>
+    </label>
+
+    <label>当店のご利用回数<span class="required">*</span>
+      <select id="usage" required>
+        <option>はじめて</option>
+        <option>2回目以降</option>
+        <option>覚えていない</option>
+      </select>
+    </label>
+
+    <button type="button" onclick="submitPersonalInfo()">予約を確定する</button>
+  </form>
+
+  <?= include("reserve_client_js.html") ?>
 </body>
 </html>
