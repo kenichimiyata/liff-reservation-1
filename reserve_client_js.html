@@ -1,10 +1,18 @@
-//クライアント側コード
+<!-- クライアント側 -->
+
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+  // サーバーサイドの getEvents() を呼び出し、成功したら setupCalendar() 実行
   google.script.run.withSuccessHandler(setupCalendar).getEvents();
+
+  // カレンダーとは別に、タイムスロットのボタン生成
   generateTimeSlots();
 });
 
+/**
+ * カレンダーを初期設定するコールバック
+ * @param {Array} events - サーバー側から取得したイベント一覧
+ */
 function setupCalendar(events) {
   const availableDates = events.map(event => event.date.split(" ")[0]);
   flatpickr("#datepicker", {
@@ -15,51 +23,82 @@ function setupCalendar(events) {
   });
 }
 
+/**
+ * 11:00～18:30 の 30分刻みボタンを生成
+ */
 function generateTimeSlots() {
   const container = document.getElementById("time-buttons");
   for (let hour = 11; hour <= 18; hour++) {
     for (let minutes = 0; minutes < 60; minutes += 30) {
-      if(hour === 18 && minutes > 30) break;
-      const time = `${hour.toString().padStart(2,"0")}:${minutes.toString().padStart(2,"0")}`;
+      // 18:30 より後は作らない
+      if (hour === 18 && minutes > 30) break;
+
+      const time = `${hour.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
       const btn = document.createElement("button");
       btn.textContent = time;
       btn.classList.add("time-button");
-      btn.onclick = () => document.getElementById("selected-time").value = time;
+
+      // ボタンをクリックしたら textarea に値を入れる
+      btn.onclick = () => {
+        document.getElementById("selected-time").value = time;
+      };
+
       container.appendChild(btn);
     }
   }
 }
 
+/**
+ * 「予約する」ボタン押下 → 個人データ入力ページへ遷移
+ */
 function submitReservation() {
   const selectedTime = document.getElementById("selected-time").value;
   if (!selectedTime) {
-    alert("日時を選択してください");
+    alert("日時を選択してください。");
     return;
   }
+  // セッションストレージに時刻を保存し、個人情報入力ページへ移動
   sessionStorage.setItem("selectedTime", selectedTime);
-  location.href = "<?= ScriptApp.getService().getUrl() ?>?page=personal";
+
+  // Apps ScriptのURLに ?page=personal を付けて遷移
+  // テンプレートHTML内でこのように書いておく（<?!= が推奨）
+  location.href = "<?!= ScriptApp.getService().getUrl() ?>?page=personal";
 }
 
+/**
+ * 個人情報入力フォームから「送信」ボタン押下
+ */
 function submitPersonalInfo() {
   const personalData = {
-    time: sessionStorage.getItem("selectedTime"),
+    time: sessionStorage.getItem("selectedTime"), // 選択済みの日時
     purpose: document.getElementById("purpose").value,
-    firstName: document.getElementById("first-name").value,
-    lastName: document.getElementById("last-name").value,
-    firstNameKana: document.getElementById("first-name-kana").value,
-    lastNameKana: document.getElementById("last-name-kana").value,
+    firstName: document.getElementById("first-name").value.trim(),
+    lastName: document.getElementById("last-name").value.trim(),
+    firstNameKana: document.getElementById("first-name-kana").value.trim(),
+    lastNameKana: document.getElementById("last-name-kana").value.trim(),
     staff: document.getElementById("staff").value,
     usage: document.getElementById("usage").value
   };
 
-  for (let key in personalData) {
+  // 必須チェック
+  for (const key in personalData) {
     if (!personalData[key]) {
       alert("すべての項目を入力してください。");
       return;
     }
   }
 
-  google.script.run.submitReservationToSheet(personalData);
-  alert("予約が完了しました！");
+  // サーバーサイドの処理を呼び出し
+  google.script.run
+    .withSuccessHandler(() => {
+      alert("予約が完了しました！");
+      // 予約完了ページへ飛ばす場合などがあれば:
+      // location.href = "<?!= ScriptApp.getService().getUrl() ?>?page=complete";
+    })
+    .withFailureHandler(error => {
+      console.error(error);
+      alert("サーバーでエラーが発生しました。");
+    })
+    .submitReservationToSheet(personalData);
 }
 </script>
