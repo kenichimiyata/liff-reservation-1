@@ -1,43 +1,101 @@
 <style>
+/* 全体のデザイン */
 body {
   font-family: Arial, sans-serif;
-  margin: 0; padding: 0; background-color: #f9f9f9;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
 }
+
+/* フォームの共通スタイル */
 form {
-  background: #fff; padding: 20px; border-radius: 5px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 5px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
+
+/* ラベルや入力要素の基本設定 */
 label {
-  display: block; margin-top:10px;
+  display: block;
+  margin-top: 10px;
 }
 input, select, button, textarea {
-  width: 100%; padding:8px; margin-top:5px;
-  border:1px solid #ccc; border-radius:4px;
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
+
+/* ボタン共通 */
 button {
-  background-color:#06c755; color:#fff; cursor:pointer;
-  border:none; margin-top:15px; font-weight:bold;
+  background-color: #06c755;
+  color: #fff;
+  cursor: pointer;
+  border: none;
+  margin-top: 15px;
+  font-weight: bold;
 }
 button:hover {
-  background-color:#04b245;
+  background-color: #04b245;
 }
+
+/* 必須表示 */
 .required {
-  color:red;
+  color: red;
 }
+
+/* カレンダー表示エリア */
 #calendar-container {
-  text-align:center; margin-bottom:20px;
+  text-align: center;
+  margin-bottom: 20px;
 }
+
+/* タイトルなど */
+h2, h3 {
+  text-align: center;
+  margin: 20px 0;
+}
+
+/* 時間ボタン */
 .time-button {
-  background-color:#06c755; color:#fff; border:none;
-  border-radius:4px; padding:8px 12px; margin:5px;
-  cursor:pointer; transition:0.3s;
+  background-color: #06c755;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 .time-button:hover {
-  background-color:#04b245;
+  background-color: #04b245;
 }
-textarea {
-  background-color:#fffbdd; font-size:1.2em;
-  text-align:center; resize:none; margin:auto;
-  height:50px; width:80%; display:block;
+
+/* 時間選択エリア（時間ボタンを横並びに） */
+#time-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px; /* ボタン間の隙間 */
+}
+
+/* 選択された日時表示 */
+textarea#selected-time {
+  background-color: #fffbdd;
+  font-size: 1.2em;
+  text-align: center;
+  resize: none;
+  margin: auto;
+  height: 50px;
+  width: 80%;
+  display: block;
+}
+
+/* ボタンを中央寄せにするコンテナ */
+.button-container {
+  text-align: center;
+  margin-top: 20px;
 }
 </style>
