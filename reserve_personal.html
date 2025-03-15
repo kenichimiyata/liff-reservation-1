@@ -4,12 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>個人情報入力</title>
-  <?= include("reserve_style.html") ?>
+  <?!= include("reserve_styles.css.html") ?> <!-- スタイルを外部ファイルから読み込み -->
 </head>
 <body>
-  <h2 style="text-align:center;">個人情報入力</h2>
-  <form id="reservation-form" style="max-width:500px;margin:auto;">
-    <label>ご用件<span class="required">*</span>
+  <!-- タイトルなどは、CSS側で text-align: center 等を指定 -->
+  <h2 class="page-title">個人情報入力</h2>
+
+  <!-- フォームにクラスを付与して幅・中央寄せをCSSで管理 -->
+  <form id="reservation-form" class="form-container">
+    <label>ご用件 <span class="required">*</span>
       <select id="purpose" required>
         <option>査定：店頭買取</option>
         <option>精錬：申込</option>
@@ -17,20 +20,23 @@
       </select>
     </label>
 
-    <label>名<span class="required">*</span>
+    <label>名 <span class="required">*</span>
       <input type="text" id="first-name" required>
     </label>
-    <label>姓<span class="required">*</span>
+
+    <label>姓 <span class="required">*</span>
       <input type="text" id="last-name" required>
     </label>
-    <label>名（フリガナ）<span class="required">*</span>
+
+    <label>名（フリガナ） <span class="required">*</span>
       <input type="text" id="first-name-kana" required>
     </label>
-    <label>姓（フリガナ）<span class="required">*</span>
+
+    <label>姓（フリガナ） <span class="required">*</span>
       <input type="text" id="last-name-kana" required>
     </label>
 
-    <label>担当者希望<span class="required">*</span>
+    <label>担当者希望 <span class="required">*</span>
       <select id="staff" required>
         <option>希望無し</option>
         <option>Nushiro</option>
@@ -39,7 +45,7 @@
       </select>
     </label>
 
-    <label>当店のご利用回数<span class="required">*</span>
+    <label>当店のご利用回数 <span class="required">*</span>
       <select id="usage" required>
         <option>はじめて</option>
         <option>2回目以降</option>
@@ -47,9 +53,13 @@
       </select>
     </label>
 
-    <button type="button" onclick="submitPersonalInfo()">予約を確定する</button>
+    <!-- 「送信」ではなく type="button" にし、JS関数を呼ぶ -->
+    <button type="button" onclick="submitPersonalInfo()">
+      予約を確定する
+    </button>
   </form>
 
-  <?= include("reserve_client_js.html") ?>
+  <!-- クライアントサイドのJSコードを読み込む -->
+  <?!= include("reserve_client_js.html") ?>
 </body>
 </html>
