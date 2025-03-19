@@ -27,7 +27,16 @@ function doGet(e) {
  * カレンダーから予定を取得
  * 終日の予定は除外して取得
  ***************************************/
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
 
+/***************************************
+ * getEvents:
+ *  カレンダーから直近30日分のイベントを取得し、
+ *  クライアントサイドでflatpickr等へ反映させるための
+ *  配列データを返す
+ ***************************************/
 function getEvents() {
   // 取得期間を設定 (今日～60日後)
   const timeMin = new Date();
