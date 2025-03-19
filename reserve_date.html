@@ -4,31 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>日時選択</title>
-  <?!= include("reserve_styles.css.html") ?> <!-- スタイルを別ファイルから読み込み -->
-
-  <!-- flatpickr（カレンダーライブラリ）の読み込み -->
+  <?!= include("reserve_style.html") ?>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
 </head>
 <body>
-  <h2>ご希望の日時を選択してください</h2>
-
-  <!-- カレンダー表示エリア -->
+  <h2 style="text-align:center;">ご希望の日時を選択してください</h2>
+  
   <div id="calendar-container">
     <input type="text" id="datepicker">
   </div>
 
-  <h3>時間を選択してください</h3>
-  <div id="time-buttons"></div>
+  <h3 style="text-align:center;">時間を選択してください</h3>
+  <div id="time-buttons" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
 
-  <h3>選択日時</h3>
+  <h3 style="text-align:center;">選択日時</h3>
   <textarea id="selected-time" readonly></textarea>
 
-  <div class="button-container">
+  <div style="text-align:center;">
     <button onclick="submitReservation()">次へ進む</button>
   </div>
 
-  <!-- クライアント側のJSコードを読み込み -->
-  <?!= include("reserve_client_js.html") ?>
+  <?!= doGetJS("reserve_client_js.html") ?>
 </body>
 </html>
