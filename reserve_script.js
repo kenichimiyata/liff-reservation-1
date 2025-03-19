@@ -24,10 +24,10 @@ function doGet(e) {
 }
 
 /***************************************
- * include: テンプレートHTML内から
- *   <?!= include("filename") ?>
- *  と呼び出せるヘルパー
+ * カレンダーから予定を取得
+ * 終日の予定は除外して取得
  ***************************************/
+
 function getEvents() {
   // 取得期間を設定 (今日～60日後)
   const timeMin = new Date();
@@ -158,4 +158,13 @@ function submitReservationToSheet(reservationData) {
     // 何かエラーが起きたらthrow → クライアント側 .withFailureHandler(...) へ
     throw new Error("予約処理に失敗: " + err);
   }
+}
+
+/***************************************
+ * include: テンプレートHTML内から
+ *   <?!= include("filename") ?>
+ *  と呼び出せるヘルパー
+ ***************************************/
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
