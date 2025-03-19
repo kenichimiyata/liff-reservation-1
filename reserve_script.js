@@ -28,21 +28,11 @@ function doGet(e) {
  *   <?!= include("filename") ?>
  *  と呼び出せるヘルパー
  ***************************************/
-function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename).getContent();
-}
-
-/***************************************
- * getEvents:
- *  カレンダーから直近30日分のイベントを取得し、
- *  クライアントサイドでflatpickr等へ反映させるための
- *  配列データを返す
- ***************************************/
 function getEvents() {
-  // 取得期間を設定 (今日～30日後)
+  // 取得期間を設定 (今日～60日後)
   const timeMin = new Date();
   const timeMax = new Date();
-  timeMax.setDate(timeMax.getDate() + 30);
+  timeMax.setDate(timeMax.getDate() + 60);
 
   // カレンダー検索パラメータ
   const optionalArgs = {
@@ -58,19 +48,33 @@ function getEvents() {
 
   // イベントが無ければ空配列を返す
   if (!events.items || events.items.length === 0) {
+    Logger.log("No events found in the specified period.");
     return [];
   }
 
-  // 必要情報を抜き出して返す (例: id, summary, start)
-  return events.items.map(ev => {
-    // 終日の場合は ev.start.date、時間指定の場合は ev.start.dateTime
-    const start = ev.start.dateTime || ev.start.date;
-    return {
-      id: ev.id,
-      summary: ev.summary || "無題のイベント",
-      start: start
-    };
-  });
+  // 終日イベント(= dateTimeがなく、dateのみのイベント)を除外
+  const results = events.items
+    .filter(ev => {
+      const isAllDay = !ev.start.dateTime && !ev.end.dateTime; 
+      if (isAllDay) {
+        Logger.log(`終日イベントを除外: ${ev.summary}`);
+      }
+      return !isAllDay; // false を返すと除外
+    })
+    .map(ev => {
+      // 終日の場合は ev.start.date、時間指定の場合は ev.start.dateTime
+      const start = ev.start.dateTime || ev.start.date;
+      return {
+        id: ev.id,
+        summary: ev.summary || "無題のイベント",
+        start: start
+      };
+    });
+
+  // ログ出力
+  Logger.log("Filtered Events: %s", JSON.stringify(results, null, 2));
+
+  return results;
 }
 
 /***************************************
