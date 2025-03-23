@@ -81,7 +81,7 @@ function submitReservation() {
   // 次ページへ移動
   // 下記URLは例。実際はあなたのウェブアプリURLに合わせてください
   // 例：script.google.com/macros/s/AKfycb.../exec?page=reserve_personal
-  const redirectUrl = "<?= ScriptApp.getService().getUrl() ?>?page=reserve_personal";
+  const redirectUrl = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycbwDAKuBDrMbvpjVXmGdDHWl1GBkXlku15jFVjq9FUUxZzgAcpoGxm9HNZeFZEJxSX6-7Q/exec?page=reserve_personal";
   console.log("redirecting to", redirectUrl);
 
   location.href = redirectUrl;
