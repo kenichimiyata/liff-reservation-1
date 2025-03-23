@@ -1,67 +1,116 @@
-//クライアント側コード//
-tesuto
 <script>
-
-document.addEventListener("DOMContentLoaded", () => {
-  google.script.run.withSuccessHandler(setupCalendar).getEvents();
-  generateTimeSlots();
-});
-
-function setupCalendar(events) {
-  const availableDates = events.map(event => event.date.split(" ")[0]);
-  flatpickr("#datepicker", {
-    locale: "ja",
-    dateFormat: "Y-m-d",
-    enable: availableDates,
-    inline: true
+  // 日付と時間を保管するための変数
+  let selectedDate = "";
+  let selectedTime = "";
+  
+  // ページ読み込み時にサーバーの getEvents() を呼び出し、時間ボタンも生成
+  document.addEventListener("DOMContentLoaded", () => {
+    google.script.run.withSuccessHandler(setupCalendar).getEvents();
+    generateTimeSlots();
   });
-}
-
-function generateTimeSlots() {
-  const container = document.getElementById("time-buttons");
-  for (let hour = 11; hour <= 18; hour++) {
-    for (let minutes = 0; minutes < 60; minutes += 30) {
-      if(hour === 18 && minutes > 30) break;
-      const time = `${hour.toString().padStart(2,"0")}:${minutes.toString().padStart(2,"0")}`;
-      const btn = document.createElement("button");
-      btn.textContent = time;
-      btn.classList.add("time-button");
-      btn.onclick = () => document.getElementById("selected-time").value = time;
-      container.appendChild(btn);
+  
+  // カレンダーを初期化する関数
+  function setupCalendar(events) {
+    // イベントの start から日付部分(Y-m-d)を取り出す
+    const availableDates = events.map(event => event.start.split("T")[0]);
+  
+    flatpickr("#flatpickr", {
+      locale: "ja",
+      dateFormat: "Y-m-d",
+      enable: availableDates,  // 選択可能な日付を制限
+      inline: true,            // カレンダーを常時表示
+      onChange: function(selectedDates, dateStr, instance) {
+        // 日付を選択し直した場合も更新
+        selectedDate = dateStr; // "YYYY-MM-DD"
+        updateSelectedDateTime();
+      }
+    });
+  }
+  
+  // 時間ボタンを生成する関数
+  function generateTimeSlots() {
+    const container = document.getElementById("time-buttons");
+    for (let hour = 11; hour <= 18; hour++) {
+      for (let minutes = 0; minutes < 60; minutes += 30) {
+        if (hour === 18 && minutes > 30) break;
+        const time = `${hour.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+  
+        // ボタン要素を作成
+        const btn = document.createElement("button");
+        btn.textContent = time;
+        btn.classList.add("time-button");
+  
+        // クリックしたら選択時刻を更新
+        btn.onclick = () => {
+          selectedTime = time; // "HH:MM"
+          updateSelectedDateTime();
+        };
+  
+        container.appendChild(btn);
+      }
     }
   }
-}
-
+  
+  // 日付と時間をまとめてテキストエリアに表示
+  function updateSelectedDateTime() {
+    document.getElementById("selected-time").value = selectedDate + " " + selectedTime;
+  }
+  
+  // 「次へ進む」ボタンを押したときの処理
 function submitReservation() {
-  const selectedTime = document.getElementById("selected-time").value;
-  if (!selectedTime) {
+  // デバッグ用メッセージをコンソールに出す
+  console.log("submitReservation called");
+
+  // アラートで呼ばれたかどうか確認
+  alert("submitReservation called");
+
+  // 選択日時テキストエリアの値を取得
+  const selectedText = document.getElementById("selected-time").value;
+  console.log("selectedText =", selectedText);
+
+  // 空なら処理中断
+  if (!selectedText.trim()) {
     alert("日時を選択してください");
-    return;
-  }
-  sessionStorage.setItem("selectedTime", selectedTime);
-  location.href = "<?= ScriptApp.getService().getUrl() ?>?page=personal";
+    console.log("No selected date/time. Aborting.");
+    return;}
+
+  // セッションストレージに保存
+  sessionStorage.setItem("selectedTime", selectedText);
+  console.log("sessionStorage.setItem done. selectedTime =", selectedText);
+
+  // 次ページへ移動
+  // 下記URLは例。実際はあなたのウェブアプリURLに合わせてください
+  // 例：script.google.com/macros/s/AKfycb.../exec?page=reserve_personal
+  const redirectUrl = "<?= ScriptApp.getService().getUrl() ?>?page=reserve_personal";
+  console.log("redirecting to", redirectUrl);
+
+  location.href = redirectUrl;
 }
-
-function submitPersonalInfo() {
-  const personalData = {
-    time: sessionStorage.getItem("selectedTime"),
-    purpose: document.getElementById("purpose").value,
-    firstName: document.getElementById("first-name").value,
-    lastName: document.getElementById("last-name").value,
-    firstNameKana: document.getElementById("first-name-kana").value,
-    lastNameKana: document.getElementById("last-name-kana").value,
-    staff: document.getElementById("staff").value,
-    usage: document.getElementById("usage").value
-  };
-
-  for (let key in personalData) {
-    if (!personalData[key]) {
-      alert("すべての項目を入力してください。");
-      return;
+  
+  // 個人情報入力ページのフォーム送信処理
+  function submitPersonalInfo() {
+    const personalData = {
+      time: sessionStorage.getItem("selectedTime"),
+      purpose: document.getElementById("purpose").value,
+      firstName: document.getElementById("first-name").value,
+      lastName: document.getElementById("last-name").value,
+      firstNameKana: document.getElementById("first-name-kana").value,
+      lastNameKana: document.getElementById("last-name-kana").value,
+      staff: document.getElementById("staff").value,
+      usage: document.getElementById("usage").value
+    };
+  
+    // 入力チェック (すべて必須の場合)
+    for (let key in personalData) {
+      if (!personalData[key]) {
+        alert("すべての項目を入力してください。");
+        return;
+      }
     }
+  
+    // サーバー側の処理を呼び出し
+    google.script.run.submitReservationToSheet(personalData);
+    alert("予約が完了しました！");
   }
-
-  google.script.run.submitReservationToSheet(personalData);
-  alert("予約が完了しました！");
-}
-</script>
+  </script>
+  

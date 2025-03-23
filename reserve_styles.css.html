@@ -1,43 +1,88 @@
 <style>
-body {
-  font-family: Arial, sans-serif;
-  margin: 0; padding: 0; background-color: #f9f9f9;
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+  }
+  form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  label {
+    display: block;
+    margin-top: 10px;
+  }
+  input, select, button, textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  button {
+    background-color: #06c755;
+    color: #fff;
+    cursor: pointer;
+    border: none;
+    margin-top: 15px;
+    font-weight: bold;
+  }
+  button:hover {
+    background-color: #85f1ad;
+  }
+  .required {
+    color: red;
+  }
+
+  /* カレンダーを中央寄せ */
+  #flatpickr {
+  display: flex;
+  justify-content: center;
 }
-form {
-  background: #fff; padding: 20px; border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-label {
-  display: block; margin-top:10px;
-}
-input, select, button, textarea {
-  width: 100%; padding:8px; margin-top:5px;
-  border:1px solid #ccc; border-radius:4px;
-}
-button {
-  background-color:#06c755; color:#fff; cursor:pointer;
-  border:none; margin-top:15px; font-weight:bold;
-}
-button:hover {
-  background-color:#04b245;
-}
-.required {
-  color:red;
-}
-#calendar-container {
-  text-align:center; margin-bottom:20px;
-}
-.time-button {
-  background-color:#06c755; color:#fff; border:none;
-  border-radius:4px; padding:8px 12px; margin:5px;
-  cursor:pointer; transition:0.3s;
-}
-.time-button:hover {
-  background-color:#04b245;
-}
-textarea {
-  background-color:#fffbdd; font-size:1.2em;
-  text-align:center; resize:none; margin:auto;
-  height:50px; width:80%; display:block;
-}
+
+  .flatpickr-calendar {
+    margin: 0 auto;
+  }
+
+  /* 時間ボタンを2列表示 (Gridレイアウト) */
+  #time-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px 3px;
+    justify-content: center;
+    max-width: 300px;  /* 必要に応じて幅を調整 */
+    margin: 0 auto;
+  }
+
+  /* 時間ボタンのスタイル */
+  .time-button {
+    background-color: #06c755;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin: 3px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .time-button:hover {
+    background-color: #85f1ad;
+  }
+
+  /* 選択した日時を表示するテキストエリア */
+  textarea {
+    background-color: #fffbdd;
+    font-size: 2.3em;
+    font-weight: bold;
+    text-align: center;
+    resize: none;
+    margin: auto;
+    height: 50px;
+    line-height: 50px;
+    width: 80%;
+    display: block;
+  }
 </style>
