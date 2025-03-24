@@ -54,43 +54,46 @@
   // 日付と時間をまとめてテキストエリアに表示
   function updateSelectedDateTime() {
     document.getElementById("selected-time").value = selectedDate + " " + selectedTime;
+
+    // selectedDate を sessionStorage に保存
+    sessionStorage.setItem("selectedDate", selectedDate);
   }
   
   // 「次へ進む」ボタンを押したときの処理
-function submitReservation() {
-  // デバッグ用メッセージをコンソールに出す
-  console.log("submitReservation called");
+  function submitReservation() {
+    // デバッグ用メッセージをコンソールに出す
+    console.log("submitReservation called");
 
-  // アラートで呼ばれたかどうか確認
-  alert("submitReservation called");
+    // アラートで呼ばれたかどうか確認
+    alert("submitReservation called");
 
-  // 選択日時テキストエリアの値を取得
-  const selectedText = document.getElementById("selected-time").value;
-  console.log("selectedText =", selectedText);
+    // 選択日時テキストエリアの値を取得
+    const selectedText = document.getElementById("selected-time").value;
+    console.log("selectedText =", selectedText);
 
-  // 空なら処理中断
-  if (!selectedText.trim()) {
-    alert("日時を選択してください");
-    console.log("No selected date/time. Aborting.");
-    return;}
+    // 空なら処理中断
+    if (!selectedText.trim()) {
+      alert("日時を選択してください");
+      console.log("No selected date/time. Aborting.");
+      return;
+    }
 
-  // セッションストレージに保存
-  sessionStorage.setItem("selectedTime", selectedText);
-  console.log("sessionStorage.setItem done. selectedTime =", selectedText);
+    // セッションストレージに保存
+    sessionStorage.setItem("selectedTime", selectedText);
+    console.log("sessionStorage.setItem done. selectedTime =", selectedText);
 
-  // 次ページへ移動
-  // 下記URLは例。実際はあなたのウェブアプリURLに合わせてください
-  // 例：script.google.com/macros/s/AKfycb.../exec?page=reserve_personal
-  const redirectUrl = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycbwDAKuBDrMbvpjVXmGdDHWl1GBkXlku15jFVjq9FUUxZzgAcpoGxm9HNZeFZEJxSX6-7Q/exec?page=reserve_personal";
-  console.log("redirecting to", redirectUrl);
+    // 次ページへ移動
+    const redirectUrl = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycbwDAKuBDrMbvpjVXmGdDHWl1GBkXlku15jFVjq9FUUxZzgAcpoGxm9HNZeFZEJxSX6-7Q/exec?page=reserve_personal";
+    console.log("redirecting to", redirectUrl);
 
-  location.href = redirectUrl;
-}
+    location.href = redirectUrl;
+  }
   
   // 個人情報入力ページのフォーム送信処理
-  function submitPersonalInfo() {
+  function submitPersonalInfo(purpose="買取査定",firstName="aaa",lastName="sss",firstNameKana="zzz",lastNameKana="kkk",staff="希望無し",usage="はじめて") {
     const personalData = {
-      time: sessionStorage.getItem("selectedTime"),
+      time: sessionStorage.getItem("selectedTime"), // `time` を保持
+      date: sessionStorage.getItem("selectedDate"), // selectedDate を取得
       purpose: document.getElementById("purpose").value,
       firstName: document.getElementById("first-name").value,
       lastName: document.getElementById("last-name").value,
@@ -99,18 +102,30 @@ function submitReservation() {
       staff: document.getElementById("staff").value,
       usage: document.getElementById("usage").value
     };
-  
-    // 入力チェック (すべて必須の場合)
+
+    console.log("submitPersonalInfo called", personalData);  // ここでデータの内容を確認
+
+    let missingFields = [];  // 入力されていない項目を格納する配列
+
+    // 入力チェック (time は必須ではない)
     for (let key in personalData) {
-      if (!personalData[key]) {
-        alert("すべての項目を入力してください。");
-        return;
+      // `time` は必須ではないため、除外
+      if ((key !== 'time' && key !== 'date') && !personalData[key]) {
+        missingFields.push(key); // 入力されていない項目を追加
       }
     }
-  
+    if (missingFields.length > 0) {
+      // どの項目が未入力か表示
+      alert("以下の項目が未入力です: " + missingFields.join(", "));
+      return;
+    }
+
+    // データ送信の確認
+    console.log("Sending data to server...");
+
     // サーバー側の処理を呼び出し
     google.script.run.submitReservationToSheet(personalData);
     alert("予約が完了しました！");
   }
-  </script>
-  
+
+</script>
