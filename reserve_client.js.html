@@ -132,21 +132,29 @@
       usage: document.getElementById("usage").value
     };
 
-    console.log("submitPersonalInfo called", personalData);
+    console.log("submitPersonalInfo called", personalData);  // ここでデータの内容を確認
 
-    let missingFields = [];
+    let missingFields = [];  // 入力されていない項目を格納する配列
+
+    // 入力チェック (time は必須ではない)
     for (let key in personalData) {
+      // `time` は必須ではないため、除外
       if ((key !== 'time' && key !== 'date') && !personalData[key]) {
-        missingFields.push(key);
+        missingFields.push(key); // 入力されていない項目を追加
       }
     }
     if (missingFields.length > 0) {
+      // どの項目が未入力か表示
       alert("以下の項目が未入力です: " + missingFields.join(", "));
       return;
     }
 
+    // データ送信の確認
     console.log("Sending data to server...");
+
+    // サーバー側の処理を呼び出し
     google.script.run.submitReservationToSheet(personalData);
     alert("予約が完了しました！");
   }
+
 </script>
