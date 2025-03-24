@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>個人情報入力</title>
-  <?!= include("reserve_styles.css.html") ?>
 </head>
 <body>
   <h2 style="text-align:center;">個人情報入力</h2>
@@ -17,17 +16,17 @@
       </select>
     </label>
 
-    <label>名<span class="required">*</span>
-      <input type="text" id="first-name" required>
-    </label>
     <label>姓<span class="required">*</span>
       <input type="text" id="last-name" required>
     </label>
-    <label>名（フリガナ）<span class="required">*</span>
-      <input type="text" id="first-name-kana" required>
+    <label>名<span class="required">*</span>
+      <input type="text" id="first-name" required>
     </label>
     <label>姓（フリガナ）<span class="required">*</span>
       <input type="text" id="last-name-kana" required>
+    </label>
+    <label>名（フリガナ）<span class="required">*</span>
+      <input type="text" id="first-name-kana" required>
     </label>
 
     <label>担当者希望<span class="required">*</span>
@@ -50,6 +49,7 @@
     <button type="button" onclick="submitPersonalInfo()">予約を確定する</button>
   </form>
 
+  <?!= include("reserve_styles.css.html") ?>
   <?!= include("reserve_client.js.html") ?>
 </body>
 </html>

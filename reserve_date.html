@@ -10,14 +10,10 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
 
-  <!-- クライアント側のJSを読み込む -->
-  <?!= include("reserve_client.js.html") ?>
-  <!-- CSSを読み込む -->
-  <?!= include("reserve_styles.css.html") ?>
 </head>
 <body>
-  <h2 style="text-align:center;">ご希望の日時を選択してください</h2>
-  
+  <h2 style="text-align:center;">来店予約</h2>
+  <h3 style="text-align:center;">日付を選択してください</h3>  
   <!-- カレンダー表示箇所 -->
     <div id="flatpickr"></div>
 
@@ -30,7 +26,12 @@
   <textarea id="selected-time" readonly></textarea>
 
   <div style="text-align:center;">
-    <button onclick="submitReservation()">次へ進む</button>
+    <button id="next-button">次へ進む</button>
   </div>
+
+<!-- クライアント側のJSを読み込む -->
+<?!= include("reserve_client.js.html") ?>
+<!-- CSSを読み込む -->
+<?!= include("reserve_styles.css.html") ?>
 </body>
 </html>

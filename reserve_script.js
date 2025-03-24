@@ -8,16 +8,25 @@ const CALENDAR_ID = "s.hoshino@urlounge.co.jp";
  ***************************************/
 function doGet(e) {
   Logger.log("ScriptApp.getService().getUrl(): %s", ScriptApp.getService().getUrl());
-  
+
   const page = e.parameter.page;
+  let tmpl; // ここで変数を宣言する
+
   if (page === 'reserve_personal') {
-    let tmpl = HtmlService.createTemplateFromFile("reserve_personal");
-    return tmpl.evaluate().setTitle("個人情報入力");
+    tmpl = HtmlService.createTemplateFromFile("reserve_personal");
   } else {
-    let tmpl = HtmlService.createTemplateFromFile("reserve_date");
-    return tmpl.evaluate().setTitle("日時選択");
+    tmpl = HtmlService.createTemplateFromFile("reserve_date");
   }
+
+  // デプロイ URL をテンプレートに渡す
+  tmpl.redirectUrl = ScriptApp.getService().getUrl();
+
+  // テンプレートを評価して返す
+  return tmpl.evaluate().setTitle(
+    page === 'reserve_personal' ? "個人情報入力" : "日時選択"
+  );
 }
+
 
 /***************************************
  * テンプレート内で
@@ -71,6 +80,7 @@ function getEvents() {
         end: end
       };
     });
+
 
   Logger.log("Filtered Events: %s", JSON.stringify(results, null, 2));
   return results;

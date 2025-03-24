@@ -4,16 +4,25 @@
   let selectedTime = "";
   let eventsData = []; // サーバーから取得したイベントを格納する
 
-  // ページ読み込み時にサーバーの getEvents() を呼び出し、時間ボタンも生成
+  // ページ読み込み完了時に実行する処理をまとめる
   document.addEventListener("DOMContentLoaded", () => {
+    // 1. サーバーからイベントを取得し、カレンダーをセットアップ
     google.script.run.withSuccessHandler(setupCalendar).getEvents();
+
+    // 2. 時間ボタンの生成
     generateTimeSlots();
+
+    // 3. 「次へ進む」ボタンのクリックイベント登録
+    const nextButton = document.getElementById("next-button");
+    nextButton.addEventListener("click", submitReservation);
   });
 
   // カレンダーを初期化する関数
   function setupCalendar(events) {
-    eventsData = events; // 取得したイベントをグローバルに保存
-    // イベントの start から日付部分(Y-m-d)を取り出す
+    // 取得したイベントをグローバルに保存
+    eventsData = events;
+
+    // イベントの start から日付部分(Y-m-d)を取り出し、選択可能な日付一覧を作る
     const availableDates = events.map(event => event.start.split("T")[0]);
 
     flatpickr("#flatpickr", {
@@ -21,7 +30,7 @@
       dateFormat: "Y-m-d",
       enable: availableDates,  // 選択可能な日付を制限
       inline: true,            // カレンダーを常時表示
-      onChange: function(selectedDates, dateStr, instance) {
+      onChange: (selectedDates, dateStr, instance) => {
         selectedDate = dateStr; // "YYYY-MM-DD"
         updateSelectedDateTime();
         updateTimeButtonsAvailability(); // 日付選択後にボタンの利用可否を更新
@@ -32,11 +41,13 @@
   // 時間ボタンを生成する関数
   function generateTimeSlots() {
     const container = document.getElementById("time-buttons");
-    // 既存のボタンがあれば一度クリアする
+    // 既存のボタンがあれば一度クリア
     container.innerHTML = "";
+
     for (let hour = 11; hour <= 18; hour++) {
       for (let minutes = 0; minutes < 60; minutes += 30) {
         if (hour === 18 && minutes > 30) break;
+
         const time = `${hour.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 
         // ボタン要素を作成
@@ -44,13 +55,12 @@
         btn.textContent = time;
         btn.classList.add("time-button");
 
-        // クリックしたら選択時刻を更新
+        // ボタンをクリックしたら時刻を選択
         btn.onclick = () => {
-          // ボタンが無効状態なら処理しない
+          // 無効状態のボタンなら処理しない
           if (btn.disabled) return;
           selectedTime = time; // "HH:MM"
           updateSelectedDateTime();
-          // 選択中のボタンにスタイルを付けるなどの処理も可能
         };
 
         container.appendChild(btn);
@@ -67,31 +77,33 @@
 
   // 各時間ボタンの利用可能／不可を更新する関数
   function updateTimeButtonsAvailability() {
-    // 選択された日付が無い場合は処理しない
+    // 日付が選択されていない場合は処理しない
     if (!selectedDate) return;
 
-    // 取得したすべてのイベントから、selectedDateと一致するものを抽出
-    const eventsOnSelectedDate = eventsData.filter(event => event.start.split("T")[0] === selectedDate);
+    // 選択された日付のイベントのみ抽出
+    const eventsOnSelectedDate = eventsData.filter(event => {
+      return event.start.split("T")[0] === selectedDate;
+    });
 
-    // 各ボタンについて、該当の30分枠に重なりがあるかチェック
+    // 30分枠ごとに、イベントと重なっているかチェック
     const buttons = document.querySelectorAll(".time-button");
     buttons.forEach(btn => {
       btn.disabled = false; // 初期化
       btn.classList.remove("disabled");
 
-      // ボタンの時間から、その日の日時オブジェクトを作成
+      // ボタンの時刻から日時オブジェクトを作成
       const slotStart = new Date(selectedDate + "T" + btn.textContent + ":00");
       const slotEnd = new Date(slotStart.getTime() + 30 * 60 * 1000); // 30分後
 
-      // 各イベントと重なっているか確認
+      // イベントとスロットが重複していればボタンを無効化
       for (let event of eventsOnSelectedDate) {
         const eventStart = new Date(event.start);
         const eventEnd = new Date(event.end);
-        // イベントとスロットの重複判定：イベント終了 > スロット開始 && イベント開始 < スロット終了
+        // イベントとスロットの重複判定
         if (eventEnd > slotStart && eventStart < slotEnd) {
           btn.disabled = true;
           btn.classList.add("disabled");
-          break; // ひとつでも重なっていれば、このボタンは無効
+          break;
         }
       }
     });
@@ -104,6 +116,7 @@
 
     const selectedText = document.getElementById("selected-time").value;
     console.log("selectedText =", selectedText);
+
     if (!selectedText.trim()) {
       alert("日時を選択してください");
       console.log("No selected date/time. Aborting.");
@@ -113,13 +126,18 @@
     sessionStorage.setItem("selectedTime", selectedText);
     console.log("sessionStorage.setItem done. selectedTime =", selectedText);
 
-    const redirectUrl = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycbwDAKuBDrMbvpjVXmGdDHWl1GBkXlku15jFVjq9FUUxZzgAcpoGxm9HNZeFZEJxSX6-7Q/exec?page=reserve_personal";
-    console.log("redirecting to", redirectUrl);
-    location.href = redirectUrl;
+    // テンプレート変数を埋め込み（Apps Script テンプレートとして処理される場合）
+    const baseUrl = "<?= redirectUrl ?>";
+    const nextUrl = baseUrl + "?page=reserve_personal";
+
+    // デバッグ用
+    alert("redirecting to: " + nextUrl);
+
+    location.href = nextUrl;
   }
 
   // 個人情報入力ページのフォーム送信処理
-  function submitPersonalInfo(purpose="買取査定",firstName="aaa",lastName="sss",firstNameKana="zzz",lastNameKana="kkk",staff="希望無し",usage="はじめて") {
+  function submitPersonalInfo() {
     const personalData = {
       time: sessionStorage.getItem("selectedTime"),
       date: sessionStorage.getItem("selectedDate"),
@@ -132,29 +150,23 @@
       usage: document.getElementById("usage").value
     };
 
-    console.log("submitPersonalInfo called", personalData);  // ここでデータの内容を確認
+    console.log("submitPersonalInfo called", personalData);
 
-    let missingFields = [];  // 入力されていない項目を格納する配列
-
-    // 入力チェック (time は必須ではない)
+    let missingFields = [];
     for (let key in personalData) {
-      // `time` は必須ではないため、除外
+      // time と date は必須ではない
       if ((key !== 'time' && key !== 'date') && !personalData[key]) {
-        missingFields.push(key); // 入力されていない項目を追加
+        missingFields.push(key);
       }
     }
+
     if (missingFields.length > 0) {
-      // どの項目が未入力か表示
       alert("以下の項目が未入力です: " + missingFields.join(", "));
       return;
     }
 
-    // データ送信の確認
     console.log("Sending data to server...");
-
-    // サーバー側の処理を呼び出し
     google.script.run.submitReservationToSheet(personalData);
     alert("予約が完了しました！");
   }
-
 </script>
