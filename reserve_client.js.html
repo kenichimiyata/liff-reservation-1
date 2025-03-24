@@ -2,95 +2,127 @@
   // 日付と時間を保管するための変数
   let selectedDate = "";
   let selectedTime = "";
-  
+  let eventsData = []; // サーバーから取得したイベントを格納する
+
   // ページ読み込み時にサーバーの getEvents() を呼び出し、時間ボタンも生成
   document.addEventListener("DOMContentLoaded", () => {
     google.script.run.withSuccessHandler(setupCalendar).getEvents();
     generateTimeSlots();
   });
-  
+
   // カレンダーを初期化する関数
   function setupCalendar(events) {
+    eventsData = events; // 取得したイベントをグローバルに保存
     // イベントの start から日付部分(Y-m-d)を取り出す
     const availableDates = events.map(event => event.start.split("T")[0]);
-  
+
     flatpickr("#flatpickr", {
       locale: "ja",
       dateFormat: "Y-m-d",
       enable: availableDates,  // 選択可能な日付を制限
       inline: true,            // カレンダーを常時表示
       onChange: function(selectedDates, dateStr, instance) {
-        // 日付を選択し直した場合も更新
         selectedDate = dateStr; // "YYYY-MM-DD"
         updateSelectedDateTime();
+        updateTimeButtonsAvailability(); // 日付選択後にボタンの利用可否を更新
       }
     });
   }
-  
+
   // 時間ボタンを生成する関数
   function generateTimeSlots() {
     const container = document.getElementById("time-buttons");
+    // 既存のボタンがあれば一度クリアする
+    container.innerHTML = "";
     for (let hour = 11; hour <= 18; hour++) {
       for (let minutes = 0; minutes < 60; minutes += 30) {
         if (hour === 18 && minutes > 30) break;
         const time = `${hour.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
-  
+
         // ボタン要素を作成
         const btn = document.createElement("button");
         btn.textContent = time;
         btn.classList.add("time-button");
-  
+
         // クリックしたら選択時刻を更新
         btn.onclick = () => {
+          // ボタンが無効状態なら処理しない
+          if (btn.disabled) return;
           selectedTime = time; // "HH:MM"
           updateSelectedDateTime();
+          // 選択中のボタンにスタイルを付けるなどの処理も可能
         };
-  
+
         container.appendChild(btn);
       }
     }
   }
-  
+
   // 日付と時間をまとめてテキストエリアに表示
   function updateSelectedDateTime() {
     document.getElementById("selected-time").value = selectedDate + " " + selectedTime;
+    // selectedDate を sessionStorage に保存
+    sessionStorage.setItem("selectedDate", selectedDate);
   }
-  
+
+  // 各時間ボタンの利用可能／不可を更新する関数
+  function updateTimeButtonsAvailability() {
+    // 選択された日付が無い場合は処理しない
+    if (!selectedDate) return;
+
+    // 取得したすべてのイベントから、selectedDateと一致するものを抽出
+    const eventsOnSelectedDate = eventsData.filter(event => event.start.split("T")[0] === selectedDate);
+
+    // 各ボタンについて、該当の30分枠に重なりがあるかチェック
+    const buttons = document.querySelectorAll(".time-button");
+    buttons.forEach(btn => {
+      btn.disabled = false; // 初期化
+      btn.classList.remove("disabled");
+
+      // ボタンの時間から、その日の日時オブジェクトを作成
+      const slotStart = new Date(selectedDate + "T" + btn.textContent + ":00");
+      const slotEnd = new Date(slotStart.getTime() + 30 * 60 * 1000); // 30分後
+
+      // 各イベントと重なっているか確認
+      for (let event of eventsOnSelectedDate) {
+        const eventStart = new Date(event.start);
+        const eventEnd = new Date(event.end);
+        // イベントとスロットの重複判定：イベント終了 > スロット開始 && イベント開始 < スロット終了
+        if (eventEnd > slotStart && eventStart < slotEnd) {
+          btn.disabled = true;
+          btn.classList.add("disabled");
+          break; // ひとつでも重なっていれば、このボタンは無効
+        }
+      }
+    });
+  }
+
   // 「次へ進む」ボタンを押したときの処理
-function submitReservation() {
-  // デバッグ用メッセージをコンソールに出す
-  console.log("submitReservation called");
+  function submitReservation() {
+    console.log("submitReservation called");
+    alert("submitReservation called");
 
-  // アラートで呼ばれたかどうか確認
-  alert("submitReservation called");
+    const selectedText = document.getElementById("selected-time").value;
+    console.log("selectedText =", selectedText);
+    if (!selectedText.trim()) {
+      alert("日時を選択してください");
+      console.log("No selected date/time. Aborting.");
+      return;
+    }
 
-  // 選択日時テキストエリアの値を取得
-  const selectedText = document.getElementById("selected-time").value;
-  console.log("selectedText =", selectedText);
+    sessionStorage.setItem("selectedTime", selectedText);
+    console.log("sessionStorage.setItem done. selectedTime =", selectedText);
 
-  // 空なら処理中断
-  if (!selectedText.trim()) {
-    alert("日時を選択してください");
-    console.log("No selected date/time. Aborting.");
-    return;}
+    const redirectUrl = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycbwDAKuBDrMbvpjVXmGdDHWl1GBkXlku15jFVjq9FUUxZzgAcpoGxm9HNZeFZEJxSX6-7Q/exec?page=reserve_personal";
+    console.log("redirecting to", redirectUrl);
+    location.href = redirectUrl;
+  }
 
-  // セッションストレージに保存
-  sessionStorage.setItem("selectedTime", selectedText);
-  console.log("sessionStorage.setItem done. selectedTime =", selectedText);
-
-  // 次ページへ移動
-  // 下記URLは例。実際はあなたのウェブアプリURLに合わせてください
-  // 例：script.google.com/macros/s/AKfycb.../exec?page=reserve_personal
-  const redirectUrl = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycbwDAKuBDrMbvpjVXmGdDHWl1GBkXlku15jFVjq9FUUxZzgAcpoGxm9HNZeFZEJxSX6-7Q/exec?page=reserve_personal";
-  console.log("redirecting to", redirectUrl);
-
-  location.href = redirectUrl;
-}
-  
   // 個人情報入力ページのフォーム送信処理
-  function submitPersonalInfo() {
+  function submitPersonalInfo(purpose="買取査定",firstName="aaa",lastName="sss",firstNameKana="zzz",lastNameKana="kkk",staff="希望無し",usage="はじめて") {
     const personalData = {
       time: sessionStorage.getItem("selectedTime"),
+      date: sessionStorage.getItem("selectedDate"),
       purpose: document.getElementById("purpose").value,
       firstName: document.getElementById("first-name").value,
       lastName: document.getElementById("last-name").value,
@@ -99,18 +131,22 @@ function submitReservation() {
       staff: document.getElementById("staff").value,
       usage: document.getElementById("usage").value
     };
-  
-    // 入力チェック (すべて必須の場合)
+
+    console.log("submitPersonalInfo called", personalData);
+
+    let missingFields = [];
     for (let key in personalData) {
-      if (!personalData[key]) {
-        alert("すべての項目を入力してください。");
-        return;
+      if ((key !== 'time' && key !== 'date') && !personalData[key]) {
+        missingFields.push(key);
       }
     }
-  
-    // サーバー側の処理を呼び出し
+    if (missingFields.length > 0) {
+      alert("以下の項目が未入力です: " + missingFields.join(", "));
+      return;
+    }
+
+    console.log("Sending data to server...");
     google.script.run.submitReservationToSheet(personalData);
     alert("予約が完了しました！");
   }
-  </script>
-  
+</script>
