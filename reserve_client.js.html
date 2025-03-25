@@ -127,7 +127,9 @@
     console.log("sessionStorage.setItem done. selectedTime =", selectedText);
 
     // テンプレート変数を埋め込み（Apps Script テンプレートとして処理される場合）
-    const baseUrl = "<?= redirectUrl ?>";
+    let baseUrl = <?= JSON.stringify(redirectUrl) ?>;
+    alert(baseUrl)
+    baseUrl = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycbw4PDHBrkhlXDZvIfTfjMy-TIz4phoT0IBOanB4IBdsFF8G6B2V89AHb14gBkyflTIq-A/exec"
     const nextUrl = baseUrl + "?page=reserve_personal";
 
     // デバッグ用

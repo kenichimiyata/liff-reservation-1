@@ -33,7 +33,9 @@ function doGet(e) {
  * <?!= include("xxx") ?> を使うためのヘルパー
  ***************************************/
 function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+  const tmpl = HtmlService.createTemplateFromFile(filename);
+  tmpl.redirectUrl = ScriptApp.getService().getUrl();  // ← ここで変数を渡す
+  return tmpl.evaluate().getContent();                 // ← ここでテンプレートとして展開
 }
 
 /***************************************
