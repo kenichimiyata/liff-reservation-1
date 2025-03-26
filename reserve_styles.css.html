@@ -1,27 +1,40 @@
 <style>
+  /* =========================
+     ▼共通スタイル（スマホ・タブレット含む）
+     ========================= */
   body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f9f9f9;
   }
+  
+  /* フォーム全体のレイアウト：スマホ～タブレットは85%幅でほぼ横幅いっぱい */
   form {
-    background: #fff;
+    width: 85%;
+    margin: 20px auto;
     padding: 20px;
+    background: #fff;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    /* PCでも最大幅を持たせたい場合は、いったん大きめに設定 */
+    max-width: 1000px; 
   }
+  
   label {
     display: block;
     margin-top: 10px;
   }
+  
   input, select, button, textarea {
     width: 100%;
-    padding: 8px;
+    font-size: 1.1rem;
+    padding: 14px;
     margin-top: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
   }
+  
   button {
     background-color: #06c755;
     color: #fff;
@@ -30,33 +43,39 @@
     margin-top: 15px;
     font-weight: bold;
   }
+  
   button:hover {
     background-color: #85f1ad;
   }
+  
   .required {
     color: red;
   }
-
+  
   /* カレンダーを中央寄せ */
   #flatpickr {
-  display: flex;
-  justify-content: center;
-}
-
+    display: flex;
+    justify-content: center;
+  }
+  
   .flatpickr-calendar {
     margin: 0 auto;
+    font-size: 1rem;
   }
-
+  
+  .flatpickr-day {
+    padding: 0.6em 0.8em; /* デフォルトより広めに設定 */
+  }
+  
   /* 時間ボタンを2列表示 (Gridレイアウト) */
   #time-buttons {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 2px 3px;
     justify-content: center;
-    max-width: 300px;  /* 必要に応じて幅を調整 */
     margin: 0 auto;
   }
-
+  
   /* 時間ボタンのスタイル */
   .time-button {
     background-color: #06c755;
@@ -71,18 +90,16 @@
   .time-button:hover {
     background-color: #85f1ad;
   }
-
+  
   /* 予約時間が埋まっていればグレーアウト */
   .time-button.disabled {
     background-color: #ccc;
     cursor: not-allowed;
   }
-
-
+  
   /* 選択した日時を表示するテキストエリア */
   textarea {
     background-color: #fffbdd;
-    font-size: 2.3em;
     font-weight: bold;
     text-align: center;
     resize: none;
@@ -92,4 +109,45 @@
     width: 80%;
     display: block;
   }
-</style>
+  
+  /* =========================
+     ▼タブレット以上（768px～）の調整
+     ========================= */
+  @media (min-width: 768px) {
+    /* ここでは幅85%のままでもOK。
+       必要に応じて少し変更したければ下記を編集してください */
+    form {
+      width: 85%;
+      max-width: 800px; /* タブレットで少しだけ上限を狭める例 */
+    }
+  
+    .flatpickr-calendar {
+      font-size: 1.1rem;
+    }
+  
+    #time-buttons {
+      max-width: 400px; /* タブレットではボタンの横幅を少し広げる */
+    }
+    
+    .time-button {
+      font-size: 1rem; /* ボタン文字をやや大きく */
+      padding: 10px 14px;
+    }
+    textarea {
+      font-size: 1.2rem;
+    }
+  }
+  
+  /* =========================
+     ▼PC（1024px以上）の調整
+     ========================= */
+  @media (min-width: 1024px) {
+    /* PCではあまり横に広がりすぎないよう中央寄せ */
+    form {
+      width: 60%;
+      max-width: 700px; 
+      margin: 40px auto;
+    }
+  }
+  </style>
+  

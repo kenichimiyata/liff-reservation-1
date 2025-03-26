@@ -85,7 +85,7 @@
     ]
   },
   "webapp": {
-    "executeAs": "USER_DEPLOYING",
+    "executeAs": "USER_ACCESSING",
     "access": "DOMAIN"
   },
   "oauthScopes": [

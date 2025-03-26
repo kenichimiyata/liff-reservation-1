@@ -1,4 +1,28 @@
 <script>
+// LINE SDK
+// URLパラメータから page の値を取得し、日時選択画面でのみログインを求める
+// ログイン済ならログインを求めない
+const urlParams = new URLSearchParams(window.location.search);
+const pageParam = urlParams.get('page');
+
+liff.init({ liffId: 'YOUR_LIFF_ID' })
+  .then(() => {
+    if (pageParam !== 'reserve_personal' && !liff.isLoggedIn()) {
+      liff.login();
+    } else if (liff.isLoggedIn()) {
+      liff.getProfile()
+        .then(profile => {
+          console.log('LINE名:', profile.displayName);
+        })
+        .catch(err => {
+          console.error('プロフィール取得に失敗しました:', err);
+        });
+    }
+  })
+  .catch(err => {
+    console.error('LIFFの初期化に失敗しました:', err);
+  });
+
   // 日付と時間を保管するための変数
   let selectedDate = "";
   let selectedTime = "";
@@ -25,15 +49,16 @@
     // イベントの start から日付部分(Y-m-d)を取り出し、選択可能な日付一覧を作る
     const availableDates = events.map(event => event.start.split("T")[0]);
 
-    flatpickr("#flatpickr", {
-      locale: "ja",
-      dateFormat: "Y-m-d",
-      enable: availableDates,  // 選択可能な日付を制限
-      inline: true,            // カレンダーを常時表示
-      onChange: (selectedDates, dateStr, instance) => {
-        selectedDate = dateStr; // "YYYY-MM-DD"
-        updateSelectedDateTime();
-        updateTimeButtonsAvailability(); // 日付選択後にボタンの利用可否を更新
+    document.addEventListener("DOMContentLoaded", () => {
+
+  // #flatpickr という要素があればカレンダー関連の処理をする
+      if (document.getElementById("flatpickr")) {
+        google.script.run.withSuccessHandler(setupCalendar).getEvents();
+        generateTimeSlots();
+        const nextButton = document.getElementById("next-button");
+        if (nextButton) {
+          nextButton.addEventListener("click", submitReservation);
+        }
       }
     });
   }
@@ -73,6 +98,11 @@
     document.getElementById("selected-time").value = selectedDate + " " + selectedTime;
     // selectedDate を sessionStorage に保存
     sessionStorage.setItem("selectedDate", selectedDate);
+
+    console.log("selectedDate:", selectedDate);
+    console.log("selectedTime:", selectedTime);
+    console.log("Combined:", selectedDate + " " + selectedTime);
+
   }
 
   // 各時間ボタンの利用可能／不可を更新する関数
@@ -127,6 +157,7 @@
     console.log("sessionStorage.setItem done. selectedTime =", selectedText);
 
     // テンプレート変数を埋め込み（Apps Script テンプレートとして処理される場合）
+    // Githubのコードチェックで「Expression expected.」エラーが出ているが、GAS固有のテンプレート記法のため無視して良い
     let baseUrl = <?= JSON.stringify(redirectUrl) ?>;
     alert(baseUrl)
     baseUrl = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycbw4PDHBrkhlXDZvIfTfjMy-TIz4phoT0IBOanB4IBdsFF8G6B2V89AHb14gBkyflTIq-A/exec"
@@ -140,9 +171,26 @@
 
   // 個人情報入力ページのフォーム送信処理
   function submitPersonalInfo() {
+
+    // sessionStorage から日時を取得
+    let storedTime = sessionStorage.getItem("selectedTime");
+
+    // もし日時が空または null なら、テスト用の日時を補完する
+    if (!storedTime || !storedTime.trim()) {
+      storedTime = "2025-03-25 17:00";  // テスト用デフォルト日時
+    }
+
     const personalData = {
+
+      // テスト用コード
+      time: storedTime,  
+      date: "",          
+
+      /*　テストが終わったら、これに差し替えること
       time: sessionStorage.getItem("selectedTime"),
       date: sessionStorage.getItem("selectedDate"),
+      */
+
       purpose: document.getElementById("purpose").value,
       firstName: document.getElementById("first-name").value,
       lastName: document.getElementById("last-name").value,
@@ -168,7 +216,15 @@
     }
 
     console.log("Sending data to server...");
-    google.script.run.submitReservationToSheet(personalData);
-    alert("予約が完了しました！");
+    
+    google.script.run
+  .withSuccessHandler(function(eventId) {
+    alert("予約が完了しました！\nイベントID: " + eventId);
+  })
+  .withFailureHandler(function(err) {
+    alert("エラーが発生しました: " + err.message);
+  })
+  .submitReservationToSheet(personalData);
+
   }
 </script>

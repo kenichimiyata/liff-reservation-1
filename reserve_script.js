@@ -3,6 +3,10 @@
  ***************************************/
 const CALENDAR_ID = "s.hoshino@urlounge.co.jp";
 
+const defaultDate = "2025-03-25";  // テスト用日付
+const defaultTime = "17:00";       // テスト用時間
+
+
 /***************************************
  * ページ振り分け用
  ***************************************/
@@ -37,6 +41,7 @@ function include(filename) {
   tmpl.redirectUrl = ScriptApp.getService().getUrl();  // ← ここで変数を渡す
   return tmpl.evaluate().getContent();                 // ← ここでテンプレートとして展開
 }
+
 
 /***************************************
  * getEvents: カレンダーからイベントを取得
@@ -122,10 +127,6 @@ function submitReservationToSheet(reservationData) {
     // 次の空行を取得
     const lastRow = sheet.getLastRow() + 1;
 
-    // 予約日時（time）を分割して「日付」と「時間」に分ける
-    const defaultDate = "2025-03-23";  // テスト日付
-    const defaultTime = "17:00";       // テスト時間
-
     // 空の場合はテスト値を使用
     const selectedDate = reservationData.time ? reservationData.time.split(" ")[0] : defaultDate;  // "YYYY-MM-DD"
     const selectedTime = reservationData.time ? reservationData.time.split(" ")[1] : defaultTime;  // "HH:MM"
@@ -144,6 +145,13 @@ function submitReservationToSheet(reservationData) {
     sheet.getRange(lastRow, staffColumn).setValue(reservationData.staff);  // スタッフ
     sheet.getRange(lastRow, usageColumn).setValue(reservationData.usage);  // 利用回数
 
+    // --- シートへの登録が完了した後にカレンダーへ登録 ---
+    const calendarEventId = addCalendarEvent(reservationData);
+    Logger.log("Calendar Event created with ID: " + calendarEventId);
+
+    // ここでイベントIDを返す
+    return calendarEventId;
+    
   } catch (err) {
     // エラーメッセージをログに記録
     Logger.log("Error details: " + err.message);
@@ -173,12 +181,14 @@ const startTime = new Date(dateTimeStr);
       `お名前: ${reservationData.lastName} ${reservationData.firstName}\n` +
       `フリガナ: ${reservationData.lastNameKana} ${reservationData.firstNameKana}\n` +
       `ご利用回数: ${reservationData.usage}`,
-    start: {
-      dateTime: startTime.toISOString()
-    },
-    end: {
-      dateTime: endTime.toISOString()
-    }
+      start: {
+        dateTime: startTime.toISOString(),
+        timeZone: "Asia/Tokyo"
+      },
+      end: {
+        dateTime: endTime.toISOString(),
+        timeZone: "Asia/Tokyo"
+      }
   };
 
 // ログにイベント内容を記録
