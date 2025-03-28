@@ -139,33 +139,37 @@ liff.init({ liffId: 'YOUR_LIFF_ID' })
     });
   }
 
-  // 「次へ進む」ボタンを押したときの処理
-  function submitReservation() {
+/**
+   * 「次へ進む」ボタン押下時の処理（個人情報入力ページへ遷移）
+   */
+   function submitReservation() {
     console.log("submitReservation called");
     alert("submitReservation called");
-
+  
     const selectedText = document.getElementById("selected-time").value;
     console.log("selectedText =", selectedText);
-
+  
     if (!selectedText.trim()) {
       alert("日時を選択してください");
       console.log("No selected date/time. Aborting.");
       return;
     }
-
+  
     sessionStorage.setItem("selectedTime", selectedText);
     console.log("sessionStorage.setItem done. selectedTime =", selectedText);
-
+  
     // テンプレート変数を埋め込み（Apps Script テンプレートとして処理される場合）
     // Githubのコードチェックで「Expression expected.」エラーが出ているが、GAS固有のテンプレート記法のため無視して良い
-    let baseUrl = <?= JSON.stringify(redirectUrl) ?>;
-    alert(baseUrl)
-    baseUrl = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycbw4PDHBrkhlXDZvIfTfjMy-TIz4phoT0IBOanB4IBdsFF8G6B2V89AHb14gBkyflTIq-A/exec"
+    let baseUrl = <?= redirectUrl ?>;
+    alert(baseUrl);
+  
+    // 実際に利用するウェブアプリURLを指定
+    //baseUrl = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycbw5FcF8Wz7-ZtTpCSJkG5fzjtUBJcjw1rfGEEa_uOUAUwhqmoo_rIQOBEtSG4_VaubLHQ/exec";
     const nextUrl = baseUrl + "?page=reserve_personal";
 
     // デバッグ用
-    alert("redirecting to: " + nextUrl);
-
+    // alert("redirecting to: " + nextUrl);
+  
     location.href = nextUrl;
   }
 
