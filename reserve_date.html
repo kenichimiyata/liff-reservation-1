@@ -2,20 +2,20 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
   <title>日時選択</title>
+  <!-- LINE SDKを読み込む -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <!-- flatpickrライブラリ -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
-
 </head>
 <body>
   <h2 style="text-align:center;">来店予約</h2>
   <h3 style="text-align:center;">日付を選択してください</h3>  
   <!-- カレンダー表示箇所 -->
-    <div id="flatpickr"></div>
+  <div id="flatpickr"></div>
 
   <h3 style="text-align:center;">時間を選択してください</h3>
   <!-- 時間ボタンを並べる要素 -->
@@ -26,12 +26,19 @@
   <textarea id="selected-time" readonly></textarea>
 
   <div style="text-align:center;">
+    <!-- 個人情報入力せず予約確定ボタン -->
+    <button type="button" onclick="submitdate()">個人情報を入力せず予約を確定する</button>
+  </div>
+
+  <div style="text-align:center;">
     <button id="next-button">次へ進む</button>
   </div>
 
-<!-- クライアント側のJSを読み込む -->
-<?!= include("reserve_client.js.html") ?>
-<!-- CSSを読み込む -->
-<?!= include("reserve_styles.css.html") ?>
+
+  <!-- クライアント側のJSを読み込む -->
+  <?!= include("reserve_client.js.html") ?>
+  <!-- CSSを読み込む -->
+  <?!= include("reserve_styles.css.html") ?>
+
 </body>
 </html>

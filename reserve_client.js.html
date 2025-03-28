@@ -5,7 +5,7 @@
 const urlParams = new URLSearchParams(window.location.search);
 const pageParam = urlParams.get('page');
 
-liff.init({ liffId: 'YOUR_LIFF_ID' })
+liff.init({ liffId: '1653447401-5bNBkyQB' })
   .then(() => {
     if (pageParam !== 'reserve_personal' && !liff.isLoggedIn()) {
       liff.login();
