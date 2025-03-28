@@ -1,34 +1,33 @@
 <script>
+// LIFF IDが変更になったら、11行のLIFF IDも必ず更新する事
+// ウェブアプリのURLが変更になったら、160行あたりのbaseUrlも必ず更新する事
+
 // LINE SDK
 // URLパラメータから page の値を取得し、日時選択画面でのみログインを求める
 // ログイン済ならログインを求めない
 const urlParams = new URLSearchParams(window.location.search);
 const pageParam = urlParams.get('page');
 
-liff.init({ liffId: 'YOUR_LIFF_ID' })
-  .then(() => {
-    if (pageParam !== 'reserve_personal' && !liff.isLoggedIn()) {
-      liff.login();
-    } else if (liff.isLoggedIn()) {
-      liff.getProfile()
-        .then(profile => {
-          console.log('LINE名:', profile.displayName);
-        })
-        .catch(err => {
-          console.error('プロフィール取得に失敗しました:', err);
-        });
-    }
-  })
-  .catch(err => {
-    console.error('LIFFの初期化に失敗しました:', err);
-  });
+  liff.init({ liffId: '1653447401-9M2zDq5z' })
+    .then(() => {
+      if (liff.isInClient()) {
+        if (!liff.isLoggedIn()) {
+          liff.login();
+        }
+      } else {
+        console.log("Not in LINE Client → skip login");
+      }
+    })
+    .catch(err => {
+      console.error("LIFF init failed:", err);
+    });
 
   // 日付と時間を保管するための変数
   let selectedDate = "";
   let selectedTime = "";
-  let eventsData = []; // サーバーから取得したイベントを格納する
+  let eventsData = [];
 
-  // ページ読み込み完了時に実行する処理をまとめる
+  // ページ読み込み時の初期処理
   document.addEventListener("DOMContentLoaded", () => {
     // 1. サーバーからイベントを取得し、カレンダーをセットアップ
     google.script.run.withSuccessHandler(setupCalendar).getEvents();
@@ -38,41 +37,44 @@ liff.init({ liffId: 'YOUR_LIFF_ID' })
 
     // 3. 「次へ進む」ボタンのクリックイベント登録
     const nextButton = document.getElementById("next-button");
-    nextButton.addEventListener("click", submitReservation);
+    if (nextButton) {
+      nextButton.addEventListener("click", submitReservation);
+    }
   });
 
-  // カレンダーを初期化する関数
+  /**
+   * カレンダーの初期化
+   */
   function setupCalendar(events) {
-    // 取得したイベントをグローバルに保存
     eventsData = events;
 
     // イベントの start から日付部分(Y-m-d)を取り出し、選択可能な日付一覧を作る
     const availableDates = events.map(event => event.start.split("T")[0]);
-
-    document.addEventListener("DOMContentLoaded", () => {
-
-  // #flatpickr という要素があればカレンダー関連の処理をする
-      if (document.getElementById("flatpickr")) {
-        google.script.run.withSuccessHandler(setupCalendar).getEvents();
-        generateTimeSlots();
-        const nextButton = document.getElementById("next-button");
-        if (nextButton) {
-          nextButton.addEventListener("click", submitReservation);
+    const calendarElem = document.getElementById("flatpickr");
+    if (calendarElem) {
+      flatpickr(calendarElem, {
+        locale: 'ja',
+        inline: true,
+        enable: availableDates,
+        onChange: function(selectedDates, dateStr) {
+          selectedDate = dateStr;
+          updateSelectedDateTime();
+          updateTimeButtonsAvailability();
         }
-      }
-    });
+      });
+    }
   }
 
-  // 時間ボタンを生成する関数
+  /**
+   * 30分単位の時間ボタン生成
+   */
   function generateTimeSlots() {
     const container = document.getElementById("time-buttons");
-    // 既存のボタンがあれば一度クリア
+    if (!container) return;
     container.innerHTML = "";
-
     for (let hour = 11; hour <= 18; hour++) {
       for (let minutes = 0; minutes < 60; minutes += 30) {
         if (hour === 18 && minutes > 30) break;
-
         const time = `${hour.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 
         // ボタン要素を作成
@@ -87,30 +89,31 @@ liff.init({ liffId: 'YOUR_LIFF_ID' })
           selectedTime = time; // "HH:MM"
           updateSelectedDateTime();
         };
-
         container.appendChild(btn);
       }
     }
   }
 
-  // 日付と時間をまとめてテキストエリアに表示
+  /**
+   * 選択した日付と時間をテキストエリアに表示し、sessionStorageに保存
+   */
   function updateSelectedDateTime() {
-    document.getElementById("selected-time").value = selectedDate + " " + selectedTime;
-    // selectedDate を sessionStorage に保存
+    const textArea = document.getElementById("selected-time");
+    if (!textArea) return;
+    let combined = selectedDate + " " + selectedTime;
+    textArea.value = combined;
     sessionStorage.setItem("selectedDate", selectedDate);
-
+    sessionStorage.setItem("selectedTime", combined);
     console.log("selectedDate:", selectedDate);
     console.log("selectedTime:", selectedTime);
-    console.log("Combined:", selectedDate + " " + selectedTime);
-
+    console.log("Combined:", combined);
   }
 
-  // 各時間ボタンの利用可能／不可を更新する関数
+  /**
+   * 選択日付の空き状況に応じて時間ボタンの有効／無効を更新
+   */
   function updateTimeButtonsAvailability() {
-    // 日付が選択されていない場合は処理しない
     if (!selectedDate) return;
-
-    // 選択された日付のイベントのみ抽出
     const eventsOnSelectedDate = eventsData.filter(event => {
       return event.start.split("T")[0] === selectedDate;
     });
@@ -118,18 +121,13 @@ liff.init({ liffId: 'YOUR_LIFF_ID' })
     // 30分枠ごとに、イベントと重なっているかチェック
     const buttons = document.querySelectorAll(".time-button");
     buttons.forEach(btn => {
-      btn.disabled = false; // 初期化
+      btn.disabled = false;
       btn.classList.remove("disabled");
-
-      // ボタンの時刻から日時オブジェクトを作成
       const slotStart = new Date(selectedDate + "T" + btn.textContent + ":00");
-      const slotEnd = new Date(slotStart.getTime() + 30 * 60 * 1000); // 30分後
-
-      // イベントとスロットが重複していればボタンを無効化
+      const slotEnd = new Date(slotStart.getTime() + 30 * 60 * 1000);
       for (let event of eventsOnSelectedDate) {
         const eventStart = new Date(event.start);
         const eventEnd = new Date(event.end);
-        // イベントとスロットの重複判定
         if (eventEnd > slotStart && eventStart < slotEnd) {
           btn.disabled = true;
           btn.classList.add("disabled");
@@ -139,33 +137,70 @@ liff.init({ liffId: 'YOUR_LIFF_ID' })
     });
   }
 
-  // 「次へ進む」ボタンを押したときの処理
+  /**
+   * 「個人情報を入力せず予約確定」ボタン押下時の処理  
+   * → LIFFのプロファイルからLINE情報を取得し、サーバー側の予約処理を呼び出す
+   */
+  function submitdate() {
+    let storedTime = sessionStorage.getItem("selectedTime") || document.getElementById("selected-time").value;
+    if (!storedTime || !storedTime.trim()) {
+      alert("日時が選択されていません");
+      return;
+    }
+    liff.getProfile().then(profile => {
+      const personalData = {
+        time: storedTime,
+        // 個人情報が未入力の場合、LINEの表示名を利用
+        firstName: profile.displayName,
+        lastName: "",
+        firstNameKana: "",
+        lastNameKana: "",
+        purpose: "LINE予約",
+        staff: "",
+        usage: "",
+        lineId: profile.userId
+      };
+      google.script.run.withSuccessHandler(function(eventId) {
+          alert("予約が完了しました！\nイベントID: " + eventId);
+      }).withFailureHandler(function(err) {
+          alert("エラーが発生しました: " + err.message);
+      }).submitDateReservationToSheet(personalData);
+    }).catch(err => {
+      alert("LIFF プロファイル取得エラー: " + err.message);
+    });
+  }
+
+  /**
+   * 「次へ進む」ボタン押下時の処理（個人情報入力ページへ遷移）
+   */
   function submitReservation() {
     console.log("submitReservation called");
     alert("submitReservation called");
-
+  
     const selectedText = document.getElementById("selected-time").value;
     console.log("selectedText =", selectedText);
-
+  
     if (!selectedText.trim()) {
       alert("日時を選択してください");
       console.log("No selected date/time. Aborting.");
       return;
     }
-
+  
     sessionStorage.setItem("selectedTime", selectedText);
     console.log("sessionStorage.setItem done. selectedTime =", selectedText);
-
+  
     // テンプレート変数を埋め込み（Apps Script テンプレートとして処理される場合）
     // Githubのコードチェックで「Expression expected.」エラーが出ているが、GAS固有のテンプレート記法のため無視して良い
     let baseUrl = <?= JSON.stringify(redirectUrl) ?>;
-    alert(baseUrl)
-    baseUrl = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycbw4PDHBrkhlXDZvIfTfjMy-TIz4phoT0IBOanB4IBdsFF8G6B2V89AHb14gBkyflTIq-A/exec"
+    alert(baseUrl);
+  
+    // 実際に利用するウェブアプリURLを指定
+    baseUrl = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycbxj2nubMLl4CbyQlNvuIbzQTEGq5pSt7XTuoU2tfOzopzfADDwJShigJlKiwZD2TgiqjQ/exec";
     const nextUrl = baseUrl + "?page=reserve_personal";
 
     // デバッグ用
     alert("redirecting to: " + nextUrl);
-
+  
     location.href = nextUrl;
   }
 
