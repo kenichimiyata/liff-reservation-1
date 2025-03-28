@@ -18,6 +18,7 @@ function doGet(e) {
   if (page === 'reserve_personal') {
     tmpl = HtmlService.createTemplateFromFile("reserve_personal");
   } else {
+    //ifrale rediect 許可
     tmpl = HtmlService.createTemplateFromFile("reserve_date");
     tmpl.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME);
   }
