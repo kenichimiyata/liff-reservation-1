@@ -20,6 +20,7 @@ function doGet(e) {
     tmpl = HtmlService.createTemplateFromFile("reserve_personal");
   } else {
     tmpl = HtmlService.createTemplateFromFile("reserve_date");
+    tmpl.evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME);
   }
 
   // デプロイ URL をテンプレートに渡す
