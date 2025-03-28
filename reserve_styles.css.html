@@ -1,17 +1,17 @@
 <style>
   /* =========================
-     ▼共通スタイル（スマホ・タブレット含む）
+     ▼共通スタイル
      ========================= */
   body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f9f9f9;
+    background-color: #fff;
   }
   
   /* フォーム全体のレイアウト：スマホ～タブレットは85%幅でほぼ横幅いっぱい */
   form {
-    width: 85%;
+    width: 95%;
     margin: 20px auto;
     padding: 20px;
     background: #fff;
@@ -59,6 +59,9 @@
   }
   
   .flatpickr-calendar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin: 0 auto;
     font-size: 1rem;
   }
@@ -73,6 +76,7 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 2px 3px;
     justify-content: center;
+    max-width: 300px;
     margin: 0 auto;
   }
   
@@ -109,11 +113,38 @@
     width: 80%;
     display: block;
   }
-  
+
   /* =========================
-     ▼タブレット以上（768px～）の調整
+     ▼スマホ（～767px）の調整
      ========================= */
-  @media (min-width: 768px) {
+     @media (max-width: 767px) {
+      body {
+    background-color: #8bae0bba;
+      }
+
+      /* ボタン全般のフォントサイズ・パディングを倍に */
+      .time-button {
+        font-size: 1.2rem;   /* もとの1remを2remに倍増 */
+        padding: 12px 16px; /* お好みで調整 */
+      }
+
+      /* 入力欄や他の要素も倍サイズにする場合 */
+      input, select, button{
+        font-size: 1.7rem;   
+        padding: 12px;    
+      }
+
+      textarea {
+        font-size: 2.0rem;
+        padding: 12px;   
+      }
+
+    }
+      
+  /* =========================
+     ▼タブレット縦（768px～1023px）の調整
+     ========================= */
+     @media (min-width: 768px) and (max-width: 1023px)  {
     /* ここでは幅85%のままでもOK。
        必要に応じて少し変更したければ下記を編集してください */
     form {
@@ -128,13 +159,13 @@
     #time-buttons {
       max-width: 400px; /* タブレットではボタンの横幅を少し広げる */
     }
-    
+
     .time-button {
-      font-size: 1rem; /* ボタン文字をやや大きく */
+      font-size: 1.3rem; /* ボタン文字をやや大きく */
       padding: 10px 14px;
     }
     textarea {
-      font-size: 1.2rem;
+      font-size: 1.5rem;
     }
   }
   
