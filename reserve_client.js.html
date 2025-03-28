@@ -144,8 +144,8 @@ liff.init({ liffId: 'YOUR_LIFF_ID' })
    */
    function submitReservation() {
     console.log("submitReservation called");
-    alert("submitReservation called");
-  
+    //alert("submitReservation called");
+
     const selectedText = document.getElementById("selected-time").value;
     console.log("selectedText =", selectedText);
   
@@ -161,10 +161,8 @@ liff.init({ liffId: 'YOUR_LIFF_ID' })
     // テンプレート変数を埋め込み（Apps Script テンプレートとして処理される場合）
     // Githubのコードチェックで「Expression expected.」エラーが出ているが、GAS固有のテンプレート記法のため無視して良い
     let baseUrl = <?= redirectUrl ?>;
-    alert(baseUrl);
-  
-    // 実際に利用するウェブアプリURLを指定
-    //baseUrl = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycbw5FcF8Wz7-ZtTpCSJkG5fzjtUBJcjw1rfGEEa_uOUAUwhqmoo_rIQOBEtSG4_VaubLHQ/exec";
+    //alert(baseUrl)
+    //baseUrl = "https://script.google.com/a/macros/urlounge.co.jp/s/AKfycbw4PDHBrkhlXDZvIfTfjMy-TIz4phoT0IBOanB4IBdsFF8G6B2V89AHb14gBkyflTIq-A/exec"
     const nextUrl = baseUrl + "?page=reserve_personal";
 
     // デバッグ用
