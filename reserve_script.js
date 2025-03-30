@@ -150,8 +150,8 @@ function submitReservationToSheet(reservationData) {
     const timestampColumn = 1;  // A列 (タイムスタンプ)
     const dateColumn = 2;       // B列 (日付)
     const timeColumn = 3;       // C列 (時間)
-    const fullNameColumn = 4;   // D列 (姓名)
-    const kanaNameColumn = 5;   // E列 (セイメイ)
+    const lineNameColumn = 4;   // D列 (LINE名)
+    const lineIdColumn = 5;     // E列 (LINE ID)
     const purposeColumn = 6;    // F列 (用件)
     const staffColumn = 7;      // G列 (スタッフ)
     const usageColumn = 8;      // H列 (利用回数)
@@ -163,15 +163,11 @@ function submitReservationToSheet(reservationData) {
     const selectedDate = reservationData.time ? reservationData.time.split(" ")[0] : defaultDate;  // "YYYY-MM-DD"
     const selectedTime = reservationData.time ? reservationData.time.split(" ")[1] : defaultTime;  // "HH:MM"
 
-    // 名前（姓＋名）を結合
-    const fullName = reservationData.lastName + " " + reservationData.firstName;
-    const kanaName = reservationData.lastNameKana + " " + reservationData.firstNameKana;
-
     sheet.getRange(lastRow, timestampColumn).setValue(new Date());
     sheet.getRange(lastRow, dateColumn).setValue(selectedDate);
     sheet.getRange(lastRow, timeColumn).setValue(selectedTime);
-    sheet.getRange(lastRow, fullNameColumn).setValue(fullName);
-    sheet.getRange(lastRow, kanaNameColumn).setValue(kanaName);
+    sheet.getRange(lastRow, lineNameColumn).setValue(lineName);
+    sheet.getRange(lastRow, lineIdColumn).setValue(lineId);
     sheet.getRange(lastRow, purposeColumn).setValue(reservationData.purpose);
     sheet.getRange(lastRow, staffColumn).setValue(reservationData.staff);
     sheet.getRange(lastRow, usageColumn).setValue(reservationData.usage);

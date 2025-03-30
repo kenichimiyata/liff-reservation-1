@@ -1,6 +1,5 @@
 <script>
   // LIFF IDが変更になったら、11行のLIFF IDも必ず更新する事
-  // ウェブアプリのURLが変更になったら、200行あたりのbaseUrlも必ず更新する事
   
   // LINE SDK
   // URLパラメータから page の値を取得し、日時選択画面でのみログインを求める
@@ -199,13 +198,13 @@
     
       // 実際に利用するウェブアプリURLを指定
       const nextUrl = baseUrl + "?page=reserve_personal";
-  
+   
       // デバッグ用
       // alert("redirecting to: " + nextUrl);
     
       window.top.location.href = nextUrl;
     }
-  
+
     // 個人情報入力ページのフォーム送信処理
     function submitPersonalInfo() {
   
@@ -229,10 +228,6 @@
         */
   
         purpose: document.getElementById("purpose").value,
-        firstName: document.getElementById("first-name").value,
-        lastName: document.getElementById("last-name").value,
-        firstNameKana: document.getElementById("first-name-kana").value,
-        lastNameKana: document.getElementById("last-name-kana").value,
         staff: document.getElementById("staff").value,
         usage: document.getElementById("usage").value
       };
