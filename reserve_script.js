@@ -117,7 +117,7 @@ function submitDateReservationToSheet(reservationData) {
     sheet.getRange(lastRow, timestampColumn).setValue(new Date());
     sheet.getRange(lastRow, dateColumn).setValue(selectedDate);
     sheet.getRange(lastRow, timeColumn).setValue(selectedTime);
-    sheet.getRange(lastRow, lineNameColumn).setValue(reservationData.firstName);
+    sheet.getRange(lastRow, lineNameColumn).setValue(reservationData.lineName);
     sheet.getRange(lastRow, lineIdColumn).setValue(reservationData.lineId);
 
     // カレンダーへのイベント追加
@@ -166,8 +166,8 @@ function submitReservationToSheet(reservationData) {
     sheet.getRange(lastRow, timestampColumn).setValue(new Date());
     sheet.getRange(lastRow, dateColumn).setValue(selectedDate);
     sheet.getRange(lastRow, timeColumn).setValue(selectedTime);
-    sheet.getRange(lastRow, lineNameColumn).setValue(lineName);
-    sheet.getRange(lastRow, lineIdColumn).setValue(lineId);
+    sheet.getRange(lastRow, lineNameColumn).setValue(reservationData.lineName);
+    sheet.getRange(lastRow, lineIdColumn).setValue(reservationData.lineId);
     sheet.getRange(lastRow, purposeColumn).setValue(reservationData.purpose);
     sheet.getRange(lastRow, staffColumn).setValue(reservationData.staff);
     sheet.getRange(lastRow, usageColumn).setValue(reservationData.usage);
@@ -195,17 +195,12 @@ function addCalendarEvent(reservationData) {
   const endTime = new Date(startTime);
   endTime.setMinutes(endTime.getMinutes() + 30);
 
-  let displayName = reservationData.firstName;
-  if (reservationData.lastName) {
-    displayName = reservationData.lastName + " " + reservationData.firstName;
-  }
-  if (reservationData.lineId) {
-    displayName += ` (LINE: ${reservationData.lineId})`;
-  }
+  // タイトルにはlineNameのみを使用
+  let displayName = reservationData.lineName;
 
   const eventObj = {
-    summary: `【予約】${displayName}様`,
-    description: `用途: ${reservationData.purpose || "なし"}`,
+    summary: `【LINE予約】${displayName}様`,
+    description: `用途: ${reservationData.purpose || "なし"}\nLINE ID: ${reservationData.lineId || "未入力"}`,
     start: {
       dateTime: startTime.toISOString(),
       timeZone: "Asia/Tokyo"
@@ -227,3 +222,4 @@ function addCalendarEvent(reservationData) {
     throw new Error("カレンダーイベントの作成に失敗しました: " + err.message);
   }
 }
+
