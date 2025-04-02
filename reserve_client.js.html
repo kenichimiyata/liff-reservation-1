@@ -52,26 +52,63 @@
     }
   });
   
-  /**
-   * カレンダーの初期化処理
-   */
+/**
+ * カレンダーの初期化処理 → 日付プルダウン用に変更
+ */
   function setupCalendar(events) {
     eventsData = events;
-    const availableDates = events.map(event => event.start.split("T")[0]);
-    const calendarElem = document.getElementById("flatpickr");
+    const availableDates = getNextTwoWeeksDates(events.map(e => e.start.split("T")[0]));
+    const calendarElem = document.getElementById("selectDate"); 
+
     if (calendarElem) {
-      flatpickr(calendarElem, {
-        locale: 'ja',
-        inline: true,
-        enable: availableDates,
-        onChange: function(selectedDates, dateStr) {
-          selectedDate = dateStr;
-          updateSelectedDateTime();
-          updateTimeButtonsAvailability();
-        }
+      const select = document.createElement("select");
+      select.id = "date-select";
+      select.innerHTML = '<option value="">選択してください</option>';
+
+      availableDates.forEach(date => {
+        const option = document.createElement("option");
+        option.value = date;
+        option.textContent = formatJapaneseDate(date);
+        select.appendChild(option);
       });
+
+      select.addEventListener("change", () => {
+        selectedDate = select.value;
+        updateSelectedDateTime();
+        updateTimeButtonsAvailability();
+      });
+
+      calendarElem.innerHTML = ""; 
+      calendarElem.appendChild(select);
     }
   }
+
+  /**
+   * 予約可能な2週間分の日付を取得（イベントに存在する日付の中から）
+   */
+  function getNextTwoWeeksDates(eventDates) {
+    const today = new Date();
+    const twoWeeksLater = new Date();
+    twoWeeksLater.setDate(today.getDate() + 13);
+
+    const result = [];
+    for (let d = new Date(today); d <= twoWeeksLater; d.setDate(d.getDate() + 1)) {
+      const yyyyMMdd = d.toISOString().split("T")[0];
+      if (eventDates.includes(yyyyMMdd)) {
+        result.push(yyyyMMdd);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * yyyy-mm-dd → yyyy年m月d日（日本語表記）に整形
+   */
+  function formatJapaneseDate(ymd) {
+    const date = new Date(ymd);
+    return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 (${["日", "月", "火", "水", "木", "金", "土"][date.getDay()]})`;
+  }
+
   
   /**
    * 30分単位の時間ボタン生成
@@ -86,7 +123,8 @@
         const time = `${hour.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
         const btn = document.createElement("button");
         btn.textContent = time;
-        btn.classList.add("time-button");
+        btn.classList.add("time-button", "disabled");
+        btn.disabled = true;
         btn.onclick = () => {
           if (btn.disabled) return;
           selectedTime = time;
