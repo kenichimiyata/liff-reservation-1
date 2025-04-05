@@ -342,6 +342,7 @@
    * フォーム送信処理
    */
   function submitPersonalInfo() {
+    google.script.run.sendChatMessage("profile 処理開始");
     let storedTime = sessionStorage.getItem("selectedTime");
     if (!storedTime || !storedTime.trim()) {
       storedTime = "2025-03-25 17:00";  // テスト用デフォルト日時

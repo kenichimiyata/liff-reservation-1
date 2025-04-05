@@ -117,7 +117,7 @@
 
   /* personalページ：ボタンのスタイル */
     .option-button {
-    background-color: #06c755;
+    background-color: #ccc;
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -128,12 +128,38 @@
     transition: 0.3s;
     width: auto;
   }
-  .option-button:hover {
-    background-color: #85f1ad;
-  }
+ 
   .option-button.disabled {
     background-color: #ccc;
     cursor: not-allowed;
+  }
+
+/* 選択中 */
+  .option-button.selected {
+      background-color: #06c755;
+    }
+
+/* ボタンの横並び用コンテナ */
+  .button-group {
+    text-align: center;
+    margin-bottom: 20px; /* 適宜調整 */
+  }
+  .button-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+  }
+
+/* ボタンを横並びにする */
+  .option-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  } 
+
+/* 必須入力項目＊ */
+   .required {
+    color: red;
   }
 
 /* 予約確定ボタン */
@@ -147,32 +173,5 @@
     cursor: pointer;
     font-size: 2.3rem;
     transition: 0.3s;
-  }
-
-/* 選択中のボタンをハイライトするクラス（任意で追加） */
-  .option-button.selected {
-    background-color: #85f1ad;
-    outline: 2px solid #06c755;
-  }
-
-/* ボタンの横並び用コンテナ */
-  .button-group {
-    margin-bottom: 20px; /* 適宜調整 */
-  }
-  .button-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 1.1rem;
-  }
-
-/* ボタンを横並びにする */
-  .option-buttons {
-    display: flex;
-    flex-wrap: wrap; /* ボタンが多い場合折り返す */
-  } 
-
-/* 必須入力項目＊ */
-   .required {
-    color: red;
   }
 </style>
