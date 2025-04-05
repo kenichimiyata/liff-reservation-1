@@ -7,34 +7,41 @@
 </head>
 <body>
   <h2 style="text-align:center;">個人情報入力</h2>
-  <form id="reservation-form" style="max-width:500px;margin:auto;">
-    <label>ご用件<span class="required">*</span>
-      <select id="purpose" required>
-        <option>査定：店頭買取</option>
-        <option>精錬：申込</option>
-        <option>精錬：受取</option>
-      </select>
-    </label>
+   
+    <div class="button-group">
+      <label for="purpose">ご用件 <span class="required">*</span></label>
+      <div class="option-buttons" id="purpose-buttons">
+        <button type="button" class="option-button" data-value="査定：店頭買取">査定：店頭買取</button>
+        <button type="button" class="option-button" data-value="精錬：申込">精錬：申込</button>
+        <button type="button" class="option-button" data-value="精錬：受取">精錬：受取</button>
+      </div>
+      <input type="hidden" id="purpose" name="purpose" required>
+    </div>
 
-    <label>担当者希望<span class="required">*</span>
-      <select id="staff" required>
-        <option>希望無し</option>
-        <option>Nushiro</option>
-        <option>Moa</option>
-        <option>Sugi</option>
-      </select>
-    </label>
-
-    <label>当店のご利用回数<span class="required">*</span>
-      <select id="usage" required>
-        <option>はじめて</option>
-        <option>2回目以降</option>
-        <option>覚えていない</option>
-      </select>
-    </label>
-
-    <button type="button" onclick="submitPersonalInfo()">予約を確定する</button>
-  </form>
+    <div class="button-group">
+      <label for="staff">担当者希望 <span class="required">*</span></label>
+      <div class="option-buttons" id="staff-buttons">
+        <button type="button" class="option-button" data-value="希望無し">希望無し</button>
+        <button type="button" class="option-button" data-value="Nushiro">Nushiro</button>
+        <button type="button" class="option-button" data-value="Moa">Moa</button>
+        <button type="button" class="option-button" data-value="Sugi">Sugi</button>
+      </div>
+      <input type="hidden" id="staff" name="staff" required>
+    </div>
+  
+    <div class="button-group">
+      <label for="usage">当店のご利用回数 <span class="required">*</span></label>
+      <div class="option-buttons" id="usage-buttons">
+        <button type="button" class="option-button" data-value="はじめて">はじめて</button>
+        <button type="button" class="option-button" data-value="2回目以降">2回目以降</button>
+        <button type="button" class="option-button" data-value="覚えていない">覚えていない</button>
+      </div>
+      <input type="hidden" id="usage" name="usage" required>
+    </div>
+  
+    <button type="button" class="submit-button" onclick="submitPersonalInfo()">
+      予約を確定する
+    </button>
 
   <?!= include("reserve_styles.css.html") ?>
   <?!= include("reserve_client.js.html") ?>

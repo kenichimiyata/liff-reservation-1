@@ -319,7 +319,27 @@
   }
   
   /**
-   * 個人情報入力ページのフォーム送信処理
+   *  ボタンクリックで hidden に値をセットし、選択中のボタンをハイライト
+  */
+  function setupOptionGroup(groupId, hiddenInputId) {
+      const groupButtons = document.querySelectorAll(`#${groupId} .option-button`);
+      const hiddenInput = document.getElementById(hiddenInputId);
+
+      groupButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          // いったん全てのボタンの選択状態を解除
+          groupButtons.forEach(btn => btn.classList.remove('selected'));
+          // クリックしたボタンを選択状態に
+          button.classList.add('selected');
+          // hidden input に値をセット
+          hiddenInput.value = button.dataset.value;
+        });
+      });
+    }
+
+
+  /**
+   * フォーム送信処理
    */
   function submitPersonalInfo() {
     let storedTime = sessionStorage.getItem("selectedTime");

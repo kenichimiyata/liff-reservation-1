@@ -22,23 +22,13 @@
   color: #333;
   }
 
-  form {
-    width: 95%;
-    max-width: 700px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
-
   label {
     display: block;
     margin-top: 10px;
     font-size: 1.1rem;
   }
 
-// とりあえずこのコードは残す
+/* とりあえずこのコードは残す */
   input, select, button, textarea {
     width: 100%;
     font-size: 2.3rem;
@@ -48,7 +38,7 @@
     border-radius: 4px;
   }
 
-// 日付プルダウン
+/* 日付プルダウン */
   #selectDate {
     text-align: center;
     font-size: 2.0rem;
@@ -63,7 +53,7 @@
     display: block;
   }
 
-// ボタン共通
+/* ボタン共通 */
   button {
     background-color: #06c755;
     color: #fff;
@@ -80,7 +70,7 @@
   }
 
 
-// 時間ボタン
+/* 時間ボタン */
   #time-buttons {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -111,7 +101,7 @@
     cursor: not-allowed;
   }
 
-// 選択日時表示エリア
+/* 選択日時表示エリア */
   textarea {
     background-color: #fffbdd;
     font-weight: bold;
@@ -125,7 +115,63 @@
     font-size: 2.5rem;
   }
 
-// 必須入力項目＊
+  /* personalページ：ボタンのスタイル */
+    .option-button {
+    background-color: #06c755;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin: 5px;
+    cursor: pointer;
+    font-size: 2.3rem;
+    transition: 0.3s;
+    width: auto;
+  }
+  .option-button:hover {
+    background-color: #85f1ad;
+  }
+  .option-button.disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
+/* 予約確定ボタン */
+  .submit-button {
+    background-color: #06c755;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin: 3px;
+    cursor: pointer;
+    font-size: 2.3rem;
+    transition: 0.3s;
+  }
+
+/* 選択中のボタンをハイライトするクラス（任意で追加） */
+  .option-button.selected {
+    background-color: #85f1ad;
+    outline: 2px solid #06c755;
+  }
+
+/* ボタンの横並び用コンテナ */
+  .button-group {
+    margin-bottom: 20px; /* 適宜調整 */
+  }
+  .button-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+  }
+
+/* ボタンを横並びにする */
+  .option-buttons {
+    display: flex;
+    flex-wrap: wrap; /* ボタンが多い場合折り返す */
+  } 
+
+/* 必須入力項目＊ */
    .required {
     color: red;
   }
