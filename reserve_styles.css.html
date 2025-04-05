@@ -38,6 +38,20 @@
     border-radius: 4px;
   }
 
+/* 選択日時表示エリア */
+textarea {
+    background-color: #fffbdd;
+    font-weight: bold;
+    text-align: center;
+    resize: none;
+    margin: auto;
+    height: 50px;
+    line-height: 50px;
+    width: 80%;
+    display: block;
+    font-size: 2.5rem;
+  }
+
 /* 日付プルダウン */
   #selectDate {
     text-align: center;
@@ -64,11 +78,6 @@
     font-size: 2.3rem;
     padding: 14px;
   }
-
-  button:hover {
-    background-color: #85f1ad;
-  }
-
 
 /* 時間ボタン */
   #time-buttons {
@@ -101,22 +110,8 @@
     cursor: not-allowed;
   }
 
-/* 選択日時表示エリア */
-  textarea {
-    background-color: #fffbdd;
-    font-weight: bold;
-    text-align: center;
-    resize: none;
-    margin: auto;
-    height: 50px;
-    line-height: 50px;
-    width: 80%;
-    display: block;
-    font-size: 2.5rem;
-  }
-
   /* personalページ：ボタンのスタイル */
-    .option-button {
+  .option-button {
     background-color: #ccc;
     color: #fff;
     border: none;
@@ -129,16 +124,11 @@
     width: auto;
   }
  
-  .option-button.disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-
 /* 選択中 */
   .option-button.selected {
-      background-color: #06c755;
-    }
-
+      background-color: #06c755 !important;
+  }
+  
 /* ボタンの横並び用コンテナ */
   .button-group {
     text-align: center;

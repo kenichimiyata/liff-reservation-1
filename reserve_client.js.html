@@ -126,6 +126,11 @@
     if (nextButton) {
       nextButton.addEventListener("click", submitReservation);
     }
+
+    // 各 option ボタングループの初期化（setupOptionGroup は1回だけ定義）
+    setupOptionGroup("purpose-buttons", "purpose");
+    setupOptionGroup("staff-buttons", "staff");
+    setupOptionGroup("usage-buttons", "usage");
   });
   
   /**
@@ -320,30 +325,27 @@
   
   /**
    *  ボタンクリックで hidden に値をセットし、選択中のボタンをハイライト
-  */
+  * 各グループ内で1つだけ選択状態にするための関数 */
   function setupOptionGroup(groupId, hiddenInputId) {
-      const groupButtons = document.querySelectorAll(`#${groupId} .option-button`);
-      const hiddenInput = document.getElementById(hiddenInputId);
+  const groupContainer = document.getElementById(groupId);
+  const groupButtons = groupContainer.getElementsByClassName("option-button");
+  const hiddenInput = document.getElementById(hiddenInputId);
 
-      groupButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          // いったん全てのボタンの選択状態を解除
-          groupButtons.forEach(btn => btn.classList.remove('selected'));
-          // クリックしたボタンを選択状態に
-          button.classList.add('selected');
-          // hidden input に値をセット
-          hiddenInput.value = button.dataset.value;
-        });
-      });
-    }
-
+  // HTMLCollection を配列に変換してループ
+  Array.from(groupButtons).forEach(button => {
+    button.addEventListener("click", () => {
+      Array.from(groupButtons).forEach(btn => btn.classList.remove("selected"));
+      button.classList.add("selected");
+      hiddenInput.value = button.dataset.value;
+    });
+  });
+}
 
   /**
    * フォーム送信処理
    */
   function submitPersonalInfo() {
-    google.script.run.sendChatMessage("profile 処理開始");
-    let storedTime = sessionStorage.getItem("selectedTime");
+     let storedTime = sessionStorage.getItem("selectedTime");
     if (!storedTime || !storedTime.trim()) {
       storedTime = "2025-03-25 17:00";  // テスト用デフォルト日時
     }
@@ -353,9 +355,13 @@
     if (profile) {
       profile = JSON.parse(profile);
     } else {
-      alert("プロフィール情報が取得できませんでした。再度ログインしてください。");
-      return;
+      profile = { displayName: "None", userId: "None" };
     }
+
+    let message = "LIFFアプリ:profile 処理開始\n" +
+                  "LINE名: " + profile.displayName + "\n" +
+                  "LINEID: " + profile.userId;
+    google.script.run.sendChatMessage(message);
 
     const personalData = {
       time: storedTime,
