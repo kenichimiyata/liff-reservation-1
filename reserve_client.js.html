@@ -185,26 +185,39 @@ if (window.top === window.self) {
   /**
    * 選択日付の空き状況に合わせ、時間ボタンの有効／無効を更新
    */
-  function updateTimeButtonsAvailability() {
-    if (!selectedDate) return;
-    const eventsOnSelectedDate = eventsData.filter(event => event.start.split("T")[0] === selectedDate);
-    const buttons = document.querySelectorAll(".time-button");
-    buttons.forEach(btn => {
-      btn.disabled = false;
-      btn.classList.remove("disabled");
-      const slotStart = new Date(selectedDate + "T" + btn.textContent + ":00");
-      const slotEnd = new Date(slotStart.getTime() + 30 * 60 * 1000);
-      for (let event of eventsOnSelectedDate) {
-        const eventStart = new Date(event.start);
-        const eventEnd = new Date(event.end);
-        if (eventEnd > slotStart && eventStart < slotEnd) {
-          btn.disabled = true;
-          btn.classList.add("disabled");
-          break;
-        }
+   function updateTimeButtonsAvailability() {
+  if (!selectedDate) return;
+  const now = new Date();
+  const todayString = now.toISOString().split("T")[0];
+  const eventsOnSelectedDate = eventsData.filter(event => event.start.split("T")[0] === selectedDate);
+  
+  // 各時間ボタンに対して処理を適用
+  const buttons = document.querySelectorAll(".time-button");
+  buttons.forEach(btn => {
+    btn.disabled = false;
+    btn.classList.remove("disabled");
+    const slotStart = new Date(selectedDate + "T" + btn.textContent + ":00");
+
+    // 現時刻以前なら無効化する
+    if (selectedDate === todayString && slotStart < now) {
+      btn.disabled = true;
+      btn.classList.add("disabled");
+      return; 
+    }
+    
+    const slotEnd = new Date(slotStart.getTime() + 30 * 60 * 1000);
+    // 既存の予約重複チェック
+    for (let event of eventsOnSelectedDate) {
+      const eventStart = new Date(event.start);
+      const eventEnd = new Date(event.end);
+      if (eventEnd > slotStart && eventStart < slotEnd) {
+        btn.disabled = true;
+        btn.classList.add("disabled");
+        break;
       }
-    });
-  }
+    }
+  });
+}
   
   /**
    * 「個人情報を入力せず予約確定」ボタン押下時の処理  
