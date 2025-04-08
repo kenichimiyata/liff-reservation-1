@@ -219,55 +219,6 @@ if (window.top === window.self) {
   });
 }
   
-  /**
-   * 「個人情報を入力せず予約確定」ボタン押下時の処理  
-   * LIFFのプロフィール情報はローカルストレージから取得（なければ再取得）
-   */
-  function submitdate() {
-    let storedTime = sessionStorage.getItem("selectedTime") || document.getElementById("selected-time").value;
-    if (!storedTime || !storedTime.trim()) {
-      alert("日時が選択されていません");
-      return;
-    }
-    // ローカルストレージからプロフィール情報を取得
-    let profile = localStorage.getItem("liffProfile");
-    if (profile) {
-      profile = JSON.parse(profile);
-      const personalData = {
-        time: storedTime,
-        lineName: profile.displayName,
-        purpose: "LINE予約",
-        staff: "",
-        usage: "",
-        lineId: profile.userId
-      };
-      google.script.run.withSuccessHandler(function(eventId) {
-          alert("予約が完了しました！\nイベントID: " + eventId);
-      }).withFailureHandler(function(err) {
-          alert("エラーが発生しました: " + err.message);
-      }).submitDateReservationToSheet(personalData);
-    } else {
-      // ローカルストレージに情報がない場合は、再度取得して保存
-      liff.getProfile().then(profile => {
-        localStorage.setItem("liffProfile", JSON.stringify(profile));
-        const personalData = {
-          time: storedTime,
-          lineName: profile.displayName,
-          purpose: "LINE予約",
-          staff: "",
-          usage: "",
-          lineId: profile.userId
-        };
-        google.script.run.withSuccessHandler(function(eventId) {
-            alert("予約が完了しました！\nイベントID: " + eventId);
-        }).withFailureHandler(function(err) {
-            alert("エラーが発生しました: " + err.message);
-        }).submitDateReservationToSheet(personalData);
-      }).catch(err => {
-        alert("LIFF プロファイル取得エラー: " + err.message);
-      });
-    }
-  }
   
   /**
    * 「次へ進む」ボタン押下時の処理（個人情報入力ページへ遷移）

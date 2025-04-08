@@ -88,52 +88,9 @@ function getEvents() {
   return results;
 }
 
-/***************************************
- * submitDateReservationToSheet: 個人情報入力なしの予約処理  
- * スプレッドシートに日時とLINE情報を書き込み、カレンダーにもイベントを追加
- ***************************************/
-function submitDateReservationToSheet(reservationData) {
-  Logger.log("Received reservation data:", reservationData);
-
-  try {
-    const spreadsheetUrl = "https://docs.google.com/spreadsheets/d/1DW_31Sf8RVlbIVN-iZ_C6QjGcuXPhvXuff60-EVGYeE/edit";
-    const ss = SpreadsheetApp.openByUrl(spreadsheetUrl);
-    const sheet = ss.getSheetByName("アプリ予約");
-    if (!sheet) {
-      throw new Error("予約データ シートが見つかりません。");
-    }
-
-    // 書き込み列の定義
-    const timestampColumn = 1;  // A列 (タイムスタンプ)
-    const dateColumn = 2;       // B列 (日付)
-    const timeColumn = 3;       // C列 (時間)
-    const lineNameColumn = 4;   // D列 (LINE名)
-    const lineIdColumn = 5;     // E列 (LINE ID)
-
-    const lastRow = sheet.getLastRow() + 1;
-    const selectedDate = reservationData.time ? reservationData.time.split(" ")[0] : defaultDate;
-    const selectedTime = reservationData.time ? reservationData.time.split(" ")[1] : defaultTime;
-
-    sheet.getRange(lastRow, timestampColumn).setValue(new Date());
-    sheet.getRange(lastRow, dateColumn).setValue(selectedDate);
-    sheet.getRange(lastRow, timeColumn).setValue(selectedTime);
-    sheet.getRange(lastRow, lineNameColumn).setValue(reservationData.lineName);
-    sheet.getRange(lastRow, lineIdColumn).setValue(reservationData.lineId);
-
-    // カレンダーへのイベント追加
-    const calendarEventId = addCalendarEvent(reservationData);
-    Logger.log("Calendar Event created with ID: " + calendarEventId);
-    return calendarEventId;
-    
-  } catch (err) {
-    Logger.log("Error details: " + err.message);
-    Logger.log("Stack trace: " + err.stack);
-    throw new Error("予約処理に失敗しました。もう一度お試しください。詳細: " + err.message);
-  }
-}
 
 /***************************************
- * submitReservationToSheet: 日時＋個人情報の予約処理（個人情報入力時）
+ * submitReservationToSheet: GSSへの転記処理
  ***************************************/
 function submitReservationToSheet(reservationData) {
   Logger.log("Received reservation data:", reservationData);
@@ -188,6 +145,7 @@ function submitReservationToSheet(reservationData) {
  * LINE予約の場合は、LINEの表示名とIDをタイトルに含める
  ***************************************/
 function addCalendarEvent(reservationData) {
+  // 日時設定（空の場合はテスト値を使用）
   const dateTimeStr = reservationData.time
     ? reservationData.time.replace(" ", "T")
     : defaultDate + "T" + defaultTime;
@@ -195,12 +153,18 @@ function addCalendarEvent(reservationData) {
   const endTime = new Date(startTime);
   endTime.setMinutes(endTime.getMinutes() + 30);
 
-  // タイトルにはlineNameのみを使用
+  // タイトルには LINE 名のみを使用
   let displayName = reservationData.lineName;
 
+  // イベントオブジェクトの作成
   const eventObj = {
-    summary: `【LINE予約】${displayName}様`,
-    description: `用途: ${reservationData.purpose || "なし"}\nLINE ID: ${reservationData.lineId || "未入力"}`,
+    summary: `${reservationData.purpose}：LINE予約：${displayName}さま`,
+    description: 
+    `用途: ${reservationData.purpose || "なし"}
+    担当者希望: ${reservationData.staff || "未入力"}
+    来店回数: ${reservationData.useage || "未入力"}
+    LINE ID: ${reservationData.lineId || "未入力"}`,
+    location: "〒170-0013 東京都豊島区東池袋１丁目２５−１４ アルファビルディング 4F",
     start: {
       dateTime: startTime.toISOString(),
       timeZone: "Asia/Tokyo"
@@ -214,12 +178,28 @@ function addCalendarEvent(reservationData) {
   Logger.log("Event Object: " + JSON.stringify(eventObj, null, 2));
 
   try {
+    // イベントの新規作成
     const newEvent = Calendar.Events.insert(eventObj, CALENDAR_ID);
     Logger.log("Event created with ID: " + newEvent.id);
+
+    // 招待するゲストリストの設定（主催者も含める場合）
+    let requiredGuests = ["subaru6363natuko@gmail.com,s.hoshino@urlounge.co.jp"];
+    requiredGuests.unshift(CALENDAR_ID);  // 主催者（カレンダーID）をゲストリストの先頭に追加
+
+    Logger.log("招待するゲストリスト: " + requiredGuests.join(", "));
+
+    // patch 更新用のイベントリソース
+    const eventResource = {
+      attendees: requiredGuests.map(email => ({ email: email }))
+    };
+
+    // patch 更新を実施して招待メール送信（sendUpdates: "all" を指定）
+    Calendar.Events.patch(eventResource, CALENDAR_ID, newEvent.id, { sendUpdates: "all" });
+    Logger.log("Google Calendar API による patch 更新と招待メール送信リクエスト完了");
+
     return newEvent.id;
   } catch (err) {
-    Logger.log("Error creating calendar event: " + err.message);
-    throw new Error("カレンダーイベントの作成に失敗しました: " + err.message);
+    Logger.log("Error creating or updating calendar event: " + err.message);
+    throw new Error("カレンダーイベントの作成または招待メール送信に失敗しました: " + err.message);
   }
 }
-
