@@ -131,6 +131,7 @@ function submitReservationToSheet(reservationData) {
 
     const calendarEventId = addCalendarEvent(reservationData);
     Logger.log("Calendar Event created with ID: " + calendarEventId);
+    sendLinePushNotification(reservationData, calendarEventId);
     return calendarEventId;
     
   } catch (err) {
@@ -160,10 +161,11 @@ function addCalendarEvent(reservationData) {
   const eventObj = {
     summary: `${reservationData.purpose}：LINE予約：${displayName}さま`,
     description: 
-    `用途: ${reservationData.purpose || "なし"}
-    担当者希望: ${reservationData.staff || "未入力"}
-    来店回数: ${reservationData.useage || "未入力"}
-    LINE ID: ${reservationData.lineId || "未入力"}`,
+    `予約者名:${displayName}さま
+  担当者希望: ${reservationData.staff || "未入力"}
+  用途: ${reservationData.purpose || "なし"}
+  来店回数: ${reservationData.usage || "未入力"}
+  LINE ID: ${reservationData.lineId || "未入力"}`,
     location: "〒170-0013 東京都豊島区東池袋１丁目２５−１４ アルファビルディング 4F",
     start: {
       dateTime: startTime.toISOString(),
@@ -183,7 +185,7 @@ function addCalendarEvent(reservationData) {
     Logger.log("Event created with ID: " + newEvent.id);
 
     // 招待するゲストリストの設定（主催者も含める場合）
-    let requiredGuests = ["subaru6363natuko@gmail.com,s.hoshino@urlounge.co.jp"];
+    let requiredGuests = ["subaru6363natuko@gmail.com","s.hoshino@urlounge.co.jp"];
     requiredGuests.unshift(CALENDAR_ID);  // 主催者（カレンダーID）をゲストリストの先頭に追加
 
     Logger.log("招待するゲストリスト: " + requiredGuests.join(", "));
@@ -202,4 +204,65 @@ function addCalendarEvent(reservationData) {
     Logger.log("Error creating or updating calendar event: " + err.message);
     throw new Error("カレンダーイベントの作成または招待メール送信に失敗しました: " + err.message);
   }
+}
+
+/***************************************
+ * 予約完了時にLINE PUSH
+ ***************************************/
+function sendLinePushNotification(reservationData, calendarEventId) {
+  // reservationDataから必要な変数を分割代入で取得
+  const { /*lineId,*/ time, /*lineName,*/ staff, purpose, usage } = reservationData;
+
+  // 送信先: LIFFで取得したユーザーIDを利用
+  const to = "Ucaf9000a9c26b2f3c7183833f554cb2c";
+  
+// "time" を日付と時間に分割（例："2025-03-25 17:00"）
+  const [reservationDate, reservationTime] = time.split(" ");
+ 
+  // LINE Messaging API のエンドポイント
+  const url = "https://api.line.me/v2/bot/message/push";
+  // チャネルアクセストークン（サーバー側で管理するためクライアントには見せない）
+  const accessToken = "nyiXxhIRpD5Z8AeLsRp2nHcfYN9PmptLWjJYQPQT/OVA4WGtgbe4krfRG+CUmwnfqw9VzMqpc48n2N84WcQuEV6lgGTLfWqHwkhWrZKxZ9yFevUYDmYpjk2RVHg9xp+ob9vWBer048e/C44FvqqupAdB04t89/1O/w1cDnyilFU="; // セキュアに管理してください
+
+  // 送信するメッセージの内容
+  const messageText =
+    "ご予約が完了いたしました📆✨\n\n" +
+    "スタッフ一同、心よりお待ち申しております。\n" +
+    "店舗アクセスマップ  https://shorturl.at/haqMf  \n" +
+    "（※Googleマップが開きます）\n\n" +
+    "📅 ご予約内容\n" +
+    "予約日: " + reservationDate + "\n" +
+    "時間: " + reservationTime + "\n" +
+    "ご予約者名: " + "Test" + "\n" +
+    "用件: " + purpose + "\n" +
+    "担当者: " + staff + "\n" +
+    "ご利用回数: " + usage + "\n\n" +
+    "※ご予約キャンセルはスタッフが対応しております。\n" +
+    "お手数ですが、キャンセルの際はご一報くださいませ。\n\n" +
+    "その他、お困りごとはございましたでしょうか。";
+    
+  const payload = {
+    to: to,
+    messages: [
+      {
+        type: "text",
+        text: messageText
+      }
+    ]
+  };
+
+  const options = {
+    method: "post",
+    contentType: "application/json",
+    headers: {
+      "Authorization": "Bearer " + accessToken
+    },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+  
+  // APIリクエスト実行
+  const response = UrlFetchApp.fetch(url, options);
+  Logger.log("LINE PUSH response: " + response.getContentText());
+  return response.getContentText();
 }

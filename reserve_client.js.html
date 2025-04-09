@@ -107,6 +107,7 @@ if (window.top === window.self) {
   
       select.addEventListener("change", () => {
         selectedDate = select.value;
+        selectedTime = "";
         updateSelectedDateTime();
         updateTimeButtonsAvailability();
       });
@@ -223,24 +224,31 @@ if (window.top === window.self) {
   /**
    * 「次へ進む」ボタン押下時の処理（個人情報入力ページへ遷移）
    */
-function submitReservation() {
+   function submitReservation() {
   console.log("submitReservation called");
 
-  // 1) 日時チェック
-  const selectedText = document.getElementById("selected-time").value.trim();
-  if (!selectedText) {
-    alert("日時を選択してください");
+  // 日付が選択されているかチェック
+  if (!selectedDate) {
+    alert("日付を選択してください");
+    return;
+  }
+  // 時間が選択されているかチェック
+  if (!selectedTime) {
+    alert("時間を選択してください");
     return;
   }
 
-  // 2) 選択日時をセッションに保存
+  // 両方選択されている場合は連結して処理
+  const selectedText = selectedDate + " " + selectedTime;
+
+  // 選択日時をセッションに保存
   sessionStorage.setItem("selectedTime", selectedText);
 
-  // 3) localStorage から LIFF プロフィールを取得
+  // localStorage から LIFF プロフィールを取得
   const raw = localStorage.getItem("liffProfile");
   const profile = raw ? JSON.parse(raw) : {};
 
-  // 4) メッセージ組み立て＆送信
+  // メッセージ組み立て＆送信
   const message =
     "LIFFアプリ:redirect時:profile 処理開始\n" +
     "LINE名: " + (profile.displayName || "") + "\n" +
@@ -249,12 +257,12 @@ function submitReservation() {
   google.script.run.sendChatMessage(message);
   console.log("sendChatMessage called with:", message);
 
-
   // ③ 最後にリダイレクト
   let baseUrl = <?= redirectUrl ?>;
   const nextUrl = baseUrl + "?page=reserve_personal";
   window.top.location.href = nextUrl;
 }
+
 
   /**
    *  ボタンクリックで hidden に値をセットし、選択中のボタンをハイライト
@@ -322,11 +330,11 @@ function submitReservation() {
     console.log("Sending data to server...");
       
     google.script.run
-      .withSuccessHandler(function(eventId) {
-        alert("予約が完了しました！\nイベントID: " + eventId);
-      })
+    .withSuccessHandler(function(eventId) {
+    alert("予約が完了しました！\nこのあとLINEメッセージにて、ご予約内容をお送りいたします。");
+  })
       .withFailureHandler(function(err) {
-        alert("エラーが発生しました: " + err.message);
+        alert("エラーが発生しました\nお手数ですが再度ご予約をお試しいただくか、当店までお問い合わせください。 " + err.message);
       })
       .submitReservationToSheet(personalData);
   }
