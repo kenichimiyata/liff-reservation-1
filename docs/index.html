@@ -1,1 +1,40 @@
-GITHUB PAGE用ファイル
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>LIFF プロフィール取得</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+  <h1>LINEプロフィール情報</h1>
+  <button onclick="getUserProfile()">プロフィール取得</button>
+
+  <div id="profile" style="margin-top: 20px;">
+    <p><strong>名前:</strong> <span id="displayName"></span></p>
+    <p><strong>User ID:</strong> <span id="userId"></span></p>
+    <img id="pictureUrl" src="" alt="プロフィール画像" style="width:100px;border-radius:50%;">
+  </div>
+
+  <script>
+    async function main() {
+      await liff.init({ liffId: "1653447401-q2p5DXw5" }); // ← あなたのLIFF IDに置き換えてね！
+
+      if (!liff.isLoggedIn()) {
+        liff.login();
+        return;
+      }
+    }
+
+    async function getUserProfile() {
+      const profile = await liff.getProfile();
+      document.getElementById('displayName').textContent = profile.displayName;
+      document.getElementById('userId').textContent = profile.userId;
+      document.getElementById('pictureUrl').src = profile.pictureUrl;
+    }
+
+    main();
+  </script>
+</body>
+</html>
+https://kenichimiyata.github.io/liff-reservation-1/
+https://cunning-guinea-amazing.ngrok-free.app/iframe.php
